@@ -1,0 +1,1505 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZEISS CSR — Story</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F4EE;
+    --ink:#122316;
+    --forest:#1F3B24;
+    --forest-deep:#0E1D12;
+    --path:#2F5233;
+    --path-track:#DCE2D6;
+    --lime:#B7D93C;
+    --lime-deep:#8FB02A;
+    --panel:#FFFFFF;
+    --muted:#5B6B5D;
+    --card-shadow: 0 18px 40px -20px rgba(14,29,18,0.28);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    overflow-x:hidden;
+  }
+  h1,h2,h3{ font-family:'Fraunces',serif; font-weight:600; margin:0; }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--lime-deep);
+  }
+  a{ color:inherit; }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    min-height:82vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:8vh 8vw;
+    color:#fff;
+    background:
+      radial-gradient(120% 90% at 15% 20%, rgba(183,217,60,0.14), transparent 55%),
+      radial-gradient(90% 70% at 80% 75%, rgba(0,0,0,0.35), transparent 60%),
+      linear-gradient(160deg, #16281A 0%, #0E1D12 55%, #0A150D 100%);
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      radial-gradient(circle at 22% 30%, rgba(255,255,255,0.05) 0, transparent 2.5%),
+      radial-gradient(circle at 68% 62%, rgba(255,255,255,0.045) 0, transparent 2%),
+      radial-gradient(circle at 40% 78%, rgba(255,255,255,0.05) 0, transparent 2.2%),
+      radial-gradient(circle at 85% 20%, rgba(255,255,255,0.04) 0, transparent 2%),
+      radial-gradient(circle at 10% 70%, rgba(255,255,255,0.045) 0, transparent 2%);
+    opacity:0.9;
+  }
+  .hero-inner{ position:relative; max-width:760px; }
+  .hero h1{
+    font-size:clamp(2.4rem, 5.4vw, 4.2rem);
+    line-height:1.08;
+    letter-spacing:-0.01em;
+  }
+  .hero h1 .accent{
+    display:block;
+    font-style:italic;
+    color:var(--lime);
+  }
+  .hero p{
+    margin-top:1.4rem;
+    font-size:1.15rem;
+    color:rgba(255,255,255,0.78);
+    max-width:44ch;
+  }
+  .scroll-cue{
+    margin-top:3.2rem;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .scroll-cue .stem{
+    width:32px; height:1px;
+    background:linear-gradient(90deg, var(--lime), transparent);
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{opacity:0.35;} 50%{opacity:1;} }
+
+  .hero-lens{
+    position:absolute; right:-8%; bottom:-12%;
+    width:min(46vw, 560px); height:min(46vw, 560px);
+    opacity:0.10; pointer-events:none;
+  }
+  .hero-lens svg{ width:100%; height:100%; }
+
+  .card--numbers{ overflow:hidden; }
+  .card--numbers .stop-art-corner{
+    position:absolute; top:-40px; right:-40px;
+    width:220px; height:220px; opacity:0.09; pointer-events:none;
+  }
+  .card--numbers .stop-art-corner svg{ width:100%; height:100%; }
+
+  /* ---------- STAGE / PATH ---------- */
+  .stage{
+    position:relative;
+    max-width:1140px;
+    margin:0 auto;
+    padding:6vh 6vw 16vh;
+  }
+  .pathsvg{ position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:visible; }
+  .pathsvg .track{ fill:none; stroke:var(--path-track); stroke-width:3; stroke-linecap:round; }
+  .pathsvg .draw{
+    fill:none; stroke:var(--path); stroke-width:3; stroke-linecap:round;
+    filter:drop-shadow(0 0 6px rgba(47,82,51,0.25));
+  }
+  .marker-layer{ position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; }
+  .marker{ position:absolute; top:0; left:0; width:46px; height:46px; margin:-23px 0 0 -23px; will-change:transform; }
+  .marker svg{ width:100%; height:100%; display:block; }
+  .marker .ring{ fill:var(--panel); stroke:var(--path); stroke-width:2; }
+  .marker .petal{ fill:var(--lime); transform-origin:22px 22px; }
+  .marker .core{ fill:var(--forest-deep); }
+
+  /* ---------- STOP (default: alternating narrow card) ---------- */
+  .stop{ position:relative; min-height:58vh; display:flex; align-items:center; padding:5vh 0; overflow:visible; }
+  .stop:nth-child(odd) .card{ margin-right:auto; text-align:left; }
+  .stop:nth-child(even) .card{ margin-left:auto; text-align:right; }
+
+  .stop-art{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:240px; height:240px; opacity:0.11; pointer-events:none; z-index:0;
+  }
+  .stop-art svg{ width:100%; height:100%; }
+  .stop:nth-child(odd) .stop-art{ right:2%; }
+  .stop:nth-child(even) .stop-art{ left:2%; }
+  .card{ position:relative; z-index:1; }
+  @media (max-width:900px){ .stop-art{ display:none; } }
+
+  .card{
+    width:min(72%, 440px);
+    background:var(--panel);
+    border-radius:16px;
+    padding:32px 34px;
+    box-shadow:var(--card-shadow);
+    opacity:0; transform:translateY(28px);
+    transition:opacity 0.7s cubic-bezier(.2,.8,.2,1), transform 0.7s cubic-bezier(.2,.8,.2,1);
+  }
+  .card.visible{ opacity:1; transform:translateY(0); }
+  .card h2{ font-size:1.7rem; margin-bottom:10px; }
+  .card p{ margin:0 0 14px; color:var(--muted); font-size:0.98rem; line-height:1.6; }
+  .card .learn{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:'IBM Plex Mono',monospace; font-size:12px;
+    letter-spacing:0.06em; color:var(--path);
+    background:none; border:none; padding:0; cursor:pointer;
+  }
+  .stop:nth-child(even) .card .learn{ flex-direction:row-reverse; }
+
+  .project-list{
+    max-height:0;
+    overflow:hidden;
+    opacity:0;
+    transition:max-height 0.45s cubic-bezier(.2,.8,.2,1), opacity 0.3s ease, margin-top 0.45s ease;
+  }
+  .project-list.expanded{
+    max-height:640px;
+    opacity:1;
+    margin-top:18px;
+    overflow:visible;
+  }
+  .year-group{ padding-top:12px; border-top:1px solid #EEEBDF; margin-top:12px; }
+  .year-group:first-child{ margin-top:0; }
+  .year-group .year{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px; letter-spacing:0.1em;
+    color:var(--lime-deep); margin-bottom:6px;
+  }
+  .year-group ul{ list-style:none; margin:0; padding:0; }
+  .year-group li{
+    font-size:0.9rem; color:var(--ink);
+    padding:5px 0; border-top:1px dashed #EEEBDF;
+  }
+  .year-group li:first-child{ border-top:none; }
+  .status-tag{
+    display:inline-block; margin-left:6px;
+    font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.04em;
+    padding:2px 7px; border-radius:20px; vertical-align:middle;
+  }
+  .status-tag.completed{ background:#E7F0DB; color:var(--forest); }
+  .status-tag.inprogress{ background:#FDF1DA; color:#9A6B1E; }
+
+  /* Deep-dive popover: only inside pillar "Learn more" panels, never on the map */
+  .project-list .proj{ position:relative; cursor:pointer; padding:5px 0; }
+  .proj-name{ display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+  .project-list .proj-details{
+    position:absolute; top:50%; left:100%; margin-left:18px; transform:translateY(-50%) translateX(-6px);
+    width:280px;
+    background:var(--panel);
+    border-radius:14px;
+    box-shadow:0 24px 48px -16px rgba(14,29,18,0.35);
+    padding:18px 20px;
+    z-index:30;
+    opacity:0; visibility:hidden;
+    transition:opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
+    pointer-events:none;
+  }
+  .project-list .proj:hover .proj-details,
+  .project-list .proj.expanded .proj-details{
+    opacity:1; visibility:visible; transform:translateY(-50%) translateX(0); pointer-events:auto;
+  }
+  /* even stops: card sits on the right, so the popover flies out to the LEFT into the empty gutter */
+  .stop:nth-child(even) .project-list .proj-details{
+    left:auto; right:100%; margin-left:0; margin-right:18px;
+    transform:translateY(-50%) translateX(6px);
+  }
+  .stop:nth-child(even) .project-list .proj:hover .proj-details,
+  .stop:nth-child(even) .project-list .proj.expanded .proj-details{
+    transform:translateY(-50%) translateX(0);
+  }
+  .dive-eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--muted); margin-bottom:12px;
+  }
+  .dive-field{ padding:9px 0; border-top:1px solid #EEEBDF; text-align:left; }
+  .dive-field:first-of-type{ border-top:none; padding-top:0; }
+  .dive-label{ font-weight:600; font-size:0.8rem; color:var(--ink); margin-bottom:3px; }
+  .dive-value{ font-size:0.8rem; color:var(--muted); line-height:1.5; }
+
+  .panel-filter{ display:flex; gap:6px; margin-bottom:14px; }
+  .panel-chip{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px;
+    padding:5px 12px; border-radius:20px;
+    border:1px solid var(--path-track); background:var(--panel);
+    color:var(--muted); cursor:pointer;
+  }
+  .panel-chip.active{ background:var(--forest); color:#fff; border-color:var(--forest); }
+  .stop:nth-child(even) .panel-filter{ justify-content:flex-end; }
+  /* Not enough side gutter on medium/narrow screens — fall back to below-anchored */
+  @media (max-width:1100px){
+    .project-list .proj-details{
+      top:100%; left:0; right:auto; margin:10px 0 0;
+      transform:translateY(-6px);
+      width:min(300px, 90vw);
+      max-height:260px; overflow-y:auto;
+    }
+    .project-list .proj:hover .proj-details,
+    .project-list .proj.expanded .proj-details{ transform:translateY(0); }
+    .stop:nth-child(even) .project-list .proj-details{ left:auto; right:0; margin:10px 0 0; }
+  }
+  @media (max-width:720px){
+    .project-list .proj-details{ left:0 !important; right:auto !important; }
+  }
+  .stop:nth-child(even) .year-group .year,
+  .stop:nth-child(even) .year-group li{ text-align:right; }
+
+  /* wide stops (numbers / video / team / stories) */
+  .stop.wide{ display:block; }
+  .stop.wide .card{ width:min(100%, 880px); margin:0 auto; text-align:left; }
+  .stop.wide .eyebrow{ justify-content:flex-start !important; }
+
+  /* ---------- PROJECT MAP ---------- */
+  .map-wrap{
+    display:grid;
+    grid-template-columns:1.15fr 1fr;
+    gap:30px;
+    align-items:start;
+  }
+  .map-svg-box{ position:relative; }
+  .india-outline{
+    fill:#EEF1E6; stroke:#C9D2BC; stroke-width:1.4;
+    filter:drop-shadow(0 10px 22px rgba(31,59,36,0.12));
+  }
+  .map-pin{ cursor:pointer; }
+  .map-pin circle.dot{ fill:var(--path); stroke:#fff; stroke-width:2.5; transition:fill 0.2s ease, r 0.2s ease; }
+  .map-pin circle.pulse{ fill:none; stroke:var(--lime-deep); stroke-width:2; opacity:0; }
+  .map-pin.active circle.dot{ fill:var(--lime-deep); r:12; }
+  .map-pin.active circle.pulse{ animation:mapPulse 1.6s ease-out infinite; }
+  @keyframes mapPulse{
+    0%{ opacity:0.55; r:13; }
+    100%{ opacity:0; r:28; }
+  }
+  .map-pin text{
+    font-family:'IBM Plex Mono',monospace; font-size:14px; font-weight:500;
+    fill:var(--forest); pointer-events:none;
+    paint-order:stroke;
+    stroke:#F6F4EE; stroke-width:4; stroke-linejoin:round;
+  }
+  .map-pin:hover circle.dot{ r:12; }
+
+  .location-list{ display:flex; flex-direction:column; gap:4px; margin-bottom:18px; }
+  .location-row{
+    display:flex; align-items:center; justify-content:space-between;
+    width:100%; text-align:left;
+    padding:10px 12px; border-radius:10px;
+    border:1px solid transparent; background:none; cursor:pointer;
+    font-family:'Inter',sans-serif; font-size:0.92rem; color:var(--ink);
+  }
+  .location-row .count{
+    font-family:'IBM Plex Mono',monospace; font-size:11px;
+    color:var(--muted); background:#EFEEE4; border-radius:20px; padding:2px 8px;
+  }
+  .location-row:hover{ background:#F6F5EF; }
+  .location-row.active{ background:#F1F3EC; border-color:#DCE2D6; }
+  .location-row.active .count{ background:var(--lime); color:var(--forest-deep); }
+
+  .location-detail{ display:none; }
+  .location-detail.active{ display:block; }
+  .location-detail .year-group{ border-top:1px solid #EEEBDF; }
+  .location-detail .year-group:first-child{ border-top:none; margin-top:0; padding-top:0; }
+  .location-detail .empty-note{ color:var(--muted); font-size:0.88rem; font-style:italic; }
+
+  .year-filter{ display:flex; gap:8px; margin-bottom:20px; }
+  .year-chip{
+    font-family:'IBM Plex Mono',monospace; font-size:12px;
+    padding:7px 16px; border-radius:20px;
+    border:1px solid var(--path-track); background:var(--panel);
+    color:var(--muted); cursor:pointer;
+    transition:background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  .year-chip.active{ background:var(--forest); color:#fff; border-color:var(--forest); }
+
+  .map-pin.dim circle.dot{ fill:#C7CDBE; }
+  .map-pin.dim text{ opacity:0.4; }
+  .map-pin.pan-india circle.dot{ fill:none; stroke:var(--path); stroke-width:2.5; stroke-dasharray:3 3; }
+  .map-pin.pan-india.active circle.dot{ stroke:var(--lime-deep); fill:none; }
+  .location-row.dim{ opacity:0.4; }
+
+  @media (max-width:820px){
+    .map-wrap{ grid-template-columns:1fr; }
+  }
+
+  /* ---------- SECTOR CHARTS ---------- */
+  .chart-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:28px; }
+  .chart-card{ text-align:center; }
+  .chart-card h3{ font-family:'Fraunces',serif; font-size:1.05rem; margin-bottom:14px; }
+  .donut{ position:relative; width:130px; height:130px; margin:0 auto 14px; }
+  .donut svg{ width:100%; height:100%; }
+  .donut-track{ fill:none; stroke:#EEEBDF; stroke-width:11; }
+  .donut-seg{ fill:none; stroke-width:11; stroke-linecap:butt; transition:stroke-dasharray 0.6s ease; }
+  .donut-total{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+  }
+  .donut-total .n{ font-family:'Fraunces',serif; font-size:1.6rem; color:var(--forest); line-height:1; }
+  .donut-total .l{ font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-top:2px; }
+
+  .chart-legend{ display:flex; justify-content:center; gap:16px; font-size:0.82rem; color:var(--muted); margin-bottom:18px; }
+  .chart-legend span{ display:inline-flex; align-items:center; gap:5px; }
+  .chart-legend .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; }
+  .chart-legend .dot.completed{ background:var(--forest); }
+  .chart-legend .dot.inprogress{ background:#D9A544; }
+
+  .year-bars{ text-align:left; }
+  .year-bars .ybar-row{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .year-bars .ybar-label{ font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); width:64px; flex-shrink:0; }
+  .year-bars .ybar-track{ flex:1; height:8px; background:#EEEBDF; border-radius:6px; overflow:hidden; }
+  .year-bars .ybar-fill{ height:100%; background:var(--lime-deep); border-radius:6px; transition:width 0.6s ease; }
+  .year-bars .ybar-count{ font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink); width:16px; text-align:right; flex-shrink:0; }
+
+  @media (max-width:820px){
+    .chart-grid{ grid-template-columns:1fr; gap:32px; }
+  }
+
+  /* ---------- NUMBERS ---------- */
+  .stat-intro{ color:var(--muted); font-size:0.96rem; line-height:1.6; margin-bottom:26px; max-width:66ch; }
+  .stat-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:22px 28px; }
+  .stat{ border-top:1px solid #E7E4D9; padding-top:14px; }
+  .stat .num{ font-family:'Fraunces',serif; font-size:1.9rem; color:var(--forest); }
+  .stat .tag{ color:var(--lime-deep); font-weight:600; font-size:0.85rem; margin-top:4px; }
+  .stat .sub{ color:var(--muted); font-size:0.82rem; margin-top:2px; }
+
+  /* ---------- CAROUSEL (shared: video + stories) — multi-card peek, like the reference ---------- */
+  .carousel{ position:relative; }
+  .carousel-scroller{
+    display:flex;
+    gap:20px;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    scroll-behavior:smooth;
+    padding-bottom:4px;
+    -ms-overflow-style:none;
+    scrollbar-width:none;
+  }
+  .carousel-scroller::-webkit-scrollbar{ display:none; }
+  .carousel-card{
+    flex:0 0 auto;
+    width:min(47%, 400px);
+    scroll-snap-align:start;
+  }
+  .media-box{
+    position:relative;
+    aspect-ratio:16/9;
+    border-radius:14px;
+    overflow:hidden;
+    background:
+      radial-gradient(60% 80% at 30% 20%, rgba(183,217,60,0.18), transparent 60%),
+      linear-gradient(135deg, #1B301F, #0E1D12);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .play-btn{
+    width:64px; height:64px; border-radius:50%;
+    background:rgba(255,255,255,0.12);
+    border:1.5px solid rgba(255,255,255,0.5);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  .play-btn svg{ width:22px; height:22px; fill:#fff; margin-left:3px; }
+  .media-box.photo{ background:none; }
+  .media-box.photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .media-box.photo::after{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.35) 100%);
+    pointer-events:none;
+  }
+
+  .carousel-caption{ margin-top:14px; }
+  .carousel-caption h3{ font-size:1.02rem; margin-bottom:4px; }
+  .carousel-caption p{ color:var(--muted); font-size:0.9rem; margin:0; line-height:1.5; }
+
+  .carousel-controls{
+    display:flex; align-items:center; justify-content:flex-end;
+    gap:8px;
+    margin-top:16px;
+  }
+  .carousel-arrow{
+    width:38px; height:38px; border-radius:50%;
+    border:1px solid #DDE3D5; background:var(--panel);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  .carousel-arrow svg{ width:16px; height:16px; fill:none; stroke:var(--forest); stroke-width:2; }
+  .carousel-arrow:hover{ background:#F1F3EC; }
+  .carousel-arrow[disabled]{ opacity:0.35; cursor:default; }
+
+  @media (max-width:720px){
+    .carousel-card{ width:82%; }
+  }
+
+  /* ---------- TEAM ---------- */
+  .team-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:26px; }
+  .member{
+    background:none; border:none; padding:0; cursor:pointer;
+    perspective:1000px;
+    opacity:0; transform:translateY(18px) scale(0.97);
+    transition:opacity 0.5s ease, transform 0.5s ease;
+    transition-delay:calc(var(--i, 0) * 90ms);
+  }
+  .card.visible .member{ opacity:1; transform:translateY(0) scale(1); }
+  .member-inner{
+    position:relative; width:100%; height:200px;
+    transform-style:preserve-3d;
+    transition:transform 0.6s cubic-bezier(.2,.8,.2,1);
+  }
+  .member.flipped .member-inner{ transform:rotateY(180deg); }
+  .member-face{
+    position:absolute; inset:0; backface-visibility:hidden;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:16px; border-radius:16px;
+  }
+  .member-face.back{ background:#F1F3EC; transform:rotateY(180deg); }
+  .member-face.back p{ font-size:0.85rem; color:var(--muted); line-height:1.5; margin:0; }
+  .member-face.back .flip-hint{ margin-top:10px; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.08em; color:var(--lime-deep); }
+  .avatar{
+    width:76px; height:76px; margin:0 auto 12px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces',serif; font-size:1.2rem; color:#fff;
+    transition:transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .member:hover .avatar{ transform:translateY(-4px) scale(1.06); box-shadow:0 14px 24px -10px rgba(31,59,36,0.45); }
+  .member h3{ font-size:0.98rem; margin-bottom:2px; }
+  .member .role{ color:var(--muted); font-size:0.82rem; }
+
+  @media (max-width:820px){
+    .stat-grid{ grid-template-columns:repeat(2, 1fr); }
+    .team-grid{ grid-template-columns:repeat(2, 1fr); }
+  }
+  @media (max-width:720px){
+    .card{ width:86%; }
+    .stop:nth-child(odd) .card, .stop:nth-child(even) .card{ margin-left:auto; margin-right:auto; text-align:left; }
+  }
+
+  /* ---------- EMBEDDED (inside an iframe) ---------- */
+  body.embedded .hero{ min-height:56vh; padding:6vh 7vw; }
+  body.embedded .hero h1{ font-size:clamp(1.8rem, 4.4vw, 2.6rem); }
+
+  /* ---------- LIGHTBOX (fullscreen video/media) ---------- */
+  .lightbox{
+    position:fixed; inset:0; z-index:999;
+    background:rgba(9,16,11,0.94);
+    display:none; align-items:center; justify-content:center;
+    padding:6vh 6vw;
+  }
+  .lightbox.open{ display:flex; }
+  .lightbox-content{ width:min(1000px, 100%); }
+  .lightbox-content .media-box{ aspect-ratio:16/9; }
+  .lightbox-content .media-box.photo{ aspect-ratio:auto; background:#000; }
+  .lightbox-content .media-box.photo img{ width:100%; height:auto; max-height:80vh; object-fit:contain; }
+  .lightbox-content .play-btn{ width:88px; height:88px; }
+  .lightbox-content .play-btn svg{ width:30px; height:30px; }
+  .lightbox-title{ color:#fff; margin-top:18px; font-size:1.15rem; text-align:center; }
+  .lightbox-close{
+    position:absolute; top:24px; right:24px;
+    width:44px; height:44px; border-radius:50%;
+    background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.3);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .lightbox-close svg{ width:18px; height:18px; stroke:#fff; fill:none; stroke-width:2; }
+  .lightbox-close:hover{ background:rgba(255,255,255,0.18); }
+  .carousel .media-box{ cursor:pointer; }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    .card{ transition:none; opacity:1; transform:none; }
+    .scroll-cue .stem{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+  <section class="hero">
+    <svg class="hero-lens" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="94" stroke="#B7D93C" stroke-width="1" fill="none"></circle>
+      <circle cx="100" cy="100" r="72" stroke="#B7D93C" stroke-width="1" fill="none"></circle>
+      <circle cx="100" cy="100" r="50" stroke="#B7D93C" stroke-width="1" fill="none"></circle>
+      <circle cx="100" cy="100" r="50" stroke="#B7D93C" stroke-width="1.5" fill="none" stroke-dasharray="4 10"></circle>
+    </svg>
+    <div class="hero-inner">
+      <span class="eyebrow" style="color:var(--lime);">#teamZEISS · CSR</span>
+      <h1>Together, we create<span class="accent">better tomorrow</span></h1>
+      <p>Educating minds, improving lives, sustaining tomorrow — our work across healthcare, education and sustainability.</p>
+      <div class="scroll-cue"><span class="stem"></span></div>
+    </div>
+  </section>
+
+  <div class="stage" id="stage">
+    <svg class="pathsvg" id="pathsvg">
+      <path class="track" id="trackPath" d=""></path>
+      <path class="draw" id="drawPath" d=""></path>
+    </svg>
+
+    <div class="marker-layer">
+      <div class="marker" id="marker">
+        <svg viewBox="0 0 44 44">
+          <circle class="ring" cx="22" cy="22" r="19"></circle>
+          <g id="petals">
+            <path class="petal" d="M22 22 C18 14, 18 6, 22 3 C26 6, 26 14, 22 22 Z"></path>
+            <path class="petal" d="M22 22 C18 14, 18 6, 22 3 C26 6, 26 14, 22 22 Z" transform="rotate(60 22 22)"></path>
+            <path class="petal" d="M22 22 C18 14, 18 6, 22 3 C26 6, 26 14, 22 22 Z" transform="rotate(120 22 22)"></path>
+            <path class="petal" d="M22 22 C18 14, 18 6, 22 3 C26 6, 26 14, 22 22 Z" transform="rotate(180 22 22)"></path>
+            <path class="petal" d="M22 22 C18 14, 18 6, 22 3 C26 6, 26 14, 22 22 Z" transform="rotate(240 22 22)"></path>
+            <path class="petal" d="M22 22 C18 14, 18 6, 22 3 C26 6, 26 14, 22 22 Z" transform="rotate(300 22 22)"></path>
+          </g>
+          <circle class="core" cx="22" cy="22" r="3.5"></circle>
+        </svg>
+      </div>
+    </div>
+
+    <!-- STOP 1: Healthcare -->
+    <section class="stop" data-stop="0">
+      <div class="stop-art">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="80" stroke="#2F5233" stroke-width="2" fill="none"></circle>
+          <path d="M30 100 L60 100 L75 60 L95 140 L115 80 L130 100 L170 100" stroke="#2F5233" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </div>
+      <div class="card">
+        <h2>Healthcare</h2>
+        <p>We are driving meaningful impact in the health care sector by supporting hospitals with essential medical equipment, conducting eye screening programs in rural communities, and partnering with institutions to strengthen access to quality health care.</p>
+        <button class="learn" type="button" data-toggle="projects-healthcare">Learn more →</button>
+        <div class="project-list" id="projects-healthcare">
+          <div class="panel-filter"><button class="panel-chip active" data-year="all" type="button">All years</button><button class="panel-chip" data-year="2024-25" type="button">FY 2024–25</button><button class="panel-chip" data-year="2025-26" type="button">FY 2025–26</button></div>
+          <div class="year-group" data-year="2024-25">
+            <div class="year">FY 2024–25</div>
+            <ul>
+              <li class="proj">
+                <div class="proj-name">Upgrade of Neo-Natal and Pediatrics care facility — Sri Sathya Sai Sarla Memorial Hospital — Karnataka <span class="status-tag completed">Completed</span></div>
+                <div class="proj-details">
+                  <div class="dive-eyebrow">Project deep dive</div>
+                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">Completed</div></div>
+                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">Upgradation of the Neo-Natal and Pediatrics care facility at Sri Sathya Sai Sarla Memorial Hospital through the provision of advanced diagnostic and life-support medical equipment to improve newborn and child healthcare outcomes.</div></div>
+                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Strengthened neo-natal and pediatric care through advanced medical equipment; improved early diagnosis, treatment, and survival outcomes for newborns and children.</div></div>
+                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 3 – Good health and well-being</div></div>
+                </div>
+              </li>
+              <li class="proj">
+                <div class="proj-name">Promoting the use of AI for eyecare and upskilling of students — Bangalore, Karnataka <span class="status-tag inprogress">In progress</span></div>
+                <div class="proj-details">
+                  <div class="dive-eyebrow">Project deep dive</div>
+                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">In progress</div></div>
+                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">CSR support to the Indian Institute of Science (IISc) for promoting the use of Artificial Intelligence in eye care and upskilling postgraduate students through AI-driven research, fellowships, and advanced technology applications.</div></div>
+                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Strengthened AI-enabled eye care research, improved early diagnosis and precision in ocular health, and built a skilled talent pool trained in AI applications for healthcare.</div></div>
+                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 3 – Good health and well-being (+1 more)</div></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="year-group" data-year="2025-26">
+            <div class="year">FY 2025–26</div>
+            <ul>
+              <li class="proj">
+                <div class="proj-name">Upgrading and Expanding 5 Vision Centers with Comprehensive Eye Care and Teleconsultation Facilities — Madhya Pradesh <span class="status-tag completed">Completed</span></div>
+                <div class="proj-details">
+                  <div class="dive-eyebrow">Project deep dive</div>
+                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">Completed</div></div>
+                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">CSR support for the upgradation of five rural Vision Centers in Madhya Pradesh and Uttar Pradesh with advanced diagnostic equipment and teleconsultation facilities to strengthen last-mile eye care delivery.</div></div>
+                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Improved early detection and access to quality eye care in underserved communities, reduced referral and travel burden for rural patients.</div></div>
+                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 3 – Good health and well-being</div></div>
+                </div>
+              </li>
+              <li class="proj">
+                <div class="proj-name">Asha Kirana — Aloka Vision Programme, Kalaburagi — Kalaburagi, Karnataka <span class="status-tag completed">Completed</span></div>
+                <div class="proj-details">
+                  <div class="dive-eyebrow">Project deep dive</div>
+                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">Completed</div></div>
+                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">Delivering eye screenings and treatment to over 530,000 school children and around 600,000 underserved adults in Kalaburagi, while promoting awareness, corrective care, and capacity building of ophthalmic officers.</div></div>
+                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Eye screening for 531,946 children and ~600,000 adults; early detection, corrective care, and surgical referrals; improved vision and awareness.</div></div>
+                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 3 – Good health and well-being</div></div>
+                </div>
+              </li>
+              <li class="proj">
+                <div class="proj-name">Development of Neurosurgical Simulators with AI-Based Skill Assessment — Delhi <span class="status-tag inprogress">In progress</span></div>
+                <div class="proj-details">
+                  <div class="dive-eyebrow">Project deep dive</div>
+                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">In progress</div></div>
+                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">CSR support to AIIMS, New Delhi, for the design and development of an AI-enabled brain aneurysm clipping simulator using ZEISS surgical data to strengthen neurosurgical training through simulation-based learning.</div></div>
+                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Improved neurosurgical skill development through safe, high-fidelity simulation, reduced surgical risk, and enhanced training outcomes for residents.</div></div>
+                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 3 – Good health and well-being (+1 more)</div></div>
+                </div>
+              </li>
+              <li class="proj">
+                <div class="proj-name">AI innovations in Vision Care — Chennai, Tamil Nadu <span class="status-tag inprogress">In progress</span></div>
+                <div class="proj-details">
+                  <div class="dive-eyebrow">Project deep dive</div>
+                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">In progress</div></div>
+                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">CSR support to Sankara Nethralaya for developing and deploying AI-based ophthalmic tools to enable early diagnosis, risk prediction, and improved clinical workflows for eye diseases such as glaucoma and retinal disorders.</div></div>
+                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Improved early detection and clinical decision-making in ophthalmology, strengthened AI-driven eye care research, and enhanced patient outcomes.</div></div>
+                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 3 – Good health and well-being (+1 more)</div></div>
+                </div>
+              </li>
+              <li class="proj">
+                <div class="proj-name">Eyecare — Aloka Vision Programme — Gujarat <span class="status-tag inprogress">In progress</span></div>
+                <div class="proj-details">
+                  <div class="dive-eyebrow">Project deep dive</div>
+                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">In progress</div></div>
+                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">The project aims to provide accessible eye care, affordable spectacles, and create awareness about preventable blindness and refractive error screening.</div></div>
+                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Improved access to affordable vision screening and spectacles for underserved communities; enabled early detection and timely spectacle delivery through mobile eye camps.</div></div>
+                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 3 – Good health and well-being</div></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STOP 2: Education -->
+    <section class="stop" data-stop="1">
+      <div class="stop-art">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 60 C50 45,80 45,100 60 C120 45,150 45,180 60 L180 150 C150 135,120 135,100 150 C80 135,50 135,20 150 Z" stroke="#2F5233" stroke-width="2" fill="none" stroke-linejoin="round"></path>
+          <line x1="100" y1="60" x2="100" y2="150" stroke="#2F5233" stroke-width="2"></line>
+        </svg>
+      </div>
+      <div class="card">
+        <h2>Education</h2>
+        <p>We are actively driving a couple of education-related CSR projects across India, with a focus on improving access to quality learning opportunities and supporting long-term educational development in underserved communities.</p>
+        <button class="learn" type="button" data-toggle="projects-education">Learn more →</button>
+        <div class="project-list" id="projects-education">
+          <div class="panel-filter"><button class="panel-chip active" data-year="all" type="button">All years</button><button class="panel-chip" data-year="2024-25" type="button">FY 2024–25</button><button class="panel-chip" data-year="2025-26" type="button">FY 2025–26</button></div>
+          <div class="year-group" data-year="2024-25">
+            <div class="year">FY 2024–25</div>
+            <ul>
+              <li class="proj">
+                <div class="proj-name">Sponsorship of skill development programs and Faculty development Programs for staff members — Maharashtra <span class="status-tag completed">Completed</span></div>
+                <div class="proj-details">
+                  <div class="dive-eyebrow">Project deep dive</div>
+                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">Completed</div></div>
+                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">Sponsorship of ongoing skill development and faculty development programs for teaching and non-teaching staff through structured courses and seminars, aimed at continuous capacity building.</div></div>
+                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Enabled continuous upskilling of teaching and non-teaching staff, strengthening instructional quality and administrative efficiency.</div></div>
+                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 4 – Quality education</div></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="year-group" data-year="2025-26">
+            <div class="year">FY 2025–26</div>
+            <ul>
+              <li class="proj">
+                <div class="proj-name">Bridging Language Barriers for Disadvantaged Children — Karnataka <span class="status-tag completed">Completed</span></div>
+                <div class="proj-details">
+                  <div class="dive-eyebrow">Project deep dive</div>
+                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">Completed</div></div>
+                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">A phased spoken English intervention implemented across partner schools, combining volunteer-led classroom sessions, digital learning tools, and teacher training under Aarunya Foundation's SPARC initiative.</div></div>
+                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Improved students' spoken English proficiency in fluency, pronunciation, and comprehension; strengthened teacher capacity through methodology training.</div></div>
+                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 4 – Quality education</div></div>
+                </div>
+              </li>
+              <li class="proj">
+                <div class="proj-name">Advanced Microscopy Course to Empower Students — Karnataka <span class="status-tag completed">Completed</span></div>
+                <div class="proj-details">
+                  <div class="dive-eyebrow">Project deep dive</div>
+                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">Completed</div></div>
+                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">A 3-month microscopy training program combining classroom learning, lab sessions, online modules, and industry exposure to build job-ready skills for careers in research, diagnostics, and manufacturing.</div></div>
+                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Enhanced technical competencies and industry readiness of participants, supporting employability in high-growth clinical research and diagnostics sectors.</div></div>
+                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 8 – Decent work and economic growth (+1 more)</div></div>
+                </div>
+              </li>
+              <li class="proj">
+                <div class="proj-name">AYUSH Panchakarma Nurse Training — Wayanad, Kerala <span class="status-tag completed">Completed</span></div>
+                <div class="proj-details">
+                  <div class="dive-eyebrow">Project deep dive</div>
+                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">Completed</div></div>
+                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">6-month AYUSH Panchakarma Nurse Training program to skill tribal and rural women in Wayanad, Kerala, in certified Ayurveda-based nursing, enabling healthcare delivery and livelihood generation.</div></div>
+                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Enhanced availability of trained Panchakarma nurses in tribal communities, improved maternal and geriatric care, and created sustainable livelihood opportunities.</div></div>
+                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 3 – Good health and well-being (+1 more)</div></div>
+                </div>
+              </li>
+              <li class="proj">
+                <div class="proj-name">Kingdom of Childhood School — Karnataka <span class="status-tag completed">Completed</span></div>
+                <div class="proj-details">
+                  <div class="dive-eyebrow">Project deep dive</div>
+                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">Completed</div></div>
+                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">CSR support for construction of fittings, doors, and window fixtures at a new eco-friendly Steiner Waldorf school campus for inclusive education.</div></div>
+                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Enabled permanent, inclusive infrastructure supporting holistic learning and future expansion for neurotypical and neurodiverse children.</div></div>
+                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 4 – Quality education</div></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STOP 3: Sustainability -->
+    <section class="stop" data-stop="2">
+      <div class="stop-art">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <line x1="100" y1="120" x2="100" y2="180" stroke="#2F5233" stroke-width="3"></line>
+          <circle cx="100" cy="80" r="55" stroke="#2F5233" stroke-width="2" fill="none"></circle>
+          <circle cx="65" cy="100" r="35" stroke="#2F5233" stroke-width="2" fill="none"></circle>
+          <circle cx="135" cy="100" r="35" stroke="#2F5233" stroke-width="2" fill="none"></circle>
+        </svg>
+      </div>
+      <div class="card">
+        <h2>Sustainability</h2>
+        <p>We are driving CSR initiatives for sustainability through tree plantation, afforestation, lake cleaning, and related environmental activities. These efforts restore ecosystems, improve biodiversity, and create long-term environmental value for communities.</p>
+        <button class="learn" type="button" data-toggle="projects-sustainability">Learn more →</button>
+        <div class="project-list" id="projects-sustainability">
+          <div class="panel-filter"><button class="panel-chip active" data-year="all" type="button">All years</button><button class="panel-chip" data-year="2025-26" type="button">FY 2025–26</button></div>
+          <div class="year-group" data-year="2025-26">
+            <div class="year">FY 2025–26</div>
+            <ul>
+              <li class="proj">
+                <div class="proj-name">Installation of a 5 kW solar power system — Sai Ranga Vidya Samsthe — Mysuru, Karnataka <span class="status-tag completed">Completed</span></div>
+                <div class="proj-details">
+                  <div class="dive-eyebrow">Project deep dive</div>
+                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">Completed</div></div>
+                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">Installation of a 5 kW solar power system at SRVS's residential campus to promote clean energy and sustainable operations for hearing-impaired children.</div></div>
+                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Reduced dependence on grid power and lowered the campus's carbon footprint while supporting a hearing-impaired student community.</div></div>
+                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 4 – Quality education (+1 more)</div></div>
+                </div>
+              </li>
+              <li class="proj">
+                <div class="proj-name">Benches Of Hope — Karnataka <span class="status-tag inprogress">In progress</span></div>
+                <div class="proj-details">
+                  <div class="dive-eyebrow">Project deep dive</div>
+                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">In progress</div></div>
+                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">Student benches and teacher tables distributed in schools, manufactured from reused wood.</div></div>
+                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Supporting over 1,000 students every year with durable, sustainably-sourced furniture.</div></div>
+                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 4 – Quality education (+2 more)</div></div>
+                </div>
+              </li>
+              <li class="proj">
+                <div class="proj-name">High-density forest plantation — Pali, Rajasthan — Pali, Rajasthan <span class="status-tag inprogress">In progress</span></div>
+                <div class="proj-details">
+                  <div class="dive-eyebrow">Project deep dive</div>
+                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">In progress</div></div>
+                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">Establishing a dense green cover through plantation of over 32,000 trees using the Miyawaki method to support the sustainability of the local ecosystem.</div></div>
+                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Likely improvement in local biodiversity, soil quality, and ecosystem health, with potential for enhanced carbon sequestration.</div></div>
+                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 13 – Climate action (+1 more)</div></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STOP 4: Projects on the map -->
+    <section class="stop wide" data-stop="3">
+      <div class="card">
+        <h2 style="margin-bottom:6px;">Where we're working</h2>
+        <p style="color:var(--muted); font-size:0.92rem; margin-bottom:16px;">Filter by year, then click a state or pin to see the projects there.</p>
+        <div class="year-filter">
+          <button class="year-chip active" data-year="all" type="button">All years</button>
+          <button class="year-chip" data-year="2024-25" type="button">FY 2024–25</button>
+          <button class="year-chip" data-year="2025-26" type="button">FY 2025–26</button>
+        </div>
+        <div class="map-wrap">
+          <div class="map-svg-box">
+            <svg viewBox="0 0 480 560" width="100%">
+              <path class="india-outline" d="M 103.2,391.9 L 95.6,380.9 L 97.0,381.2 L 97.4,380.9 L 95.3,379.6 L 93.7,374.7 L 90.4,370.8 L 85.3,342.9 L 83.0,337.0 L 82.1,336.6 L 82.7,335.7 L 84.6,337.7 L 84.6,334.9 L 81.9,334.6 L 80.9,329.1 L 83.7,324.3 L 82.7,323.4 L 79.9,325.3 L 80.7,323.8 L 80.5,321.5 L 80.0,322.3 L 79.7,321.7 L 80.0,321.6 L 80.0,321.2 L 80.7,320.4 L 80.7,320.1 L 79.8,321.3 L 79.8,316.0 L 77.7,310.9 L 79.3,309.7 L 78.6,307.5 L 81.5,296.8 L 78.8,290.5 L 78.2,290.3 L 78.0,290.3 L 77.9,290.6 L 77.8,291.4 L 77.3,291.6 L 76.7,288.4 L 79.2,284.2 L 77.3,285.0 L 77.4,283.1 L 78.5,282.5 L 78.8,282.7 L 79.9,282.6 L 80.6,282.3 L 75.9,282.3 L 75.4,277.7 L 76.6,273.9 L 79.4,274.3 L 80.2,273.2 L 81.3,273.5 L 81.8,273.2 L 81.9,272.6 L 75.1,273.9 L 75.2,273.1 L 74.9,273.3 L 74.3,272.3 L 73.6,272.1 L 73.9,271.4 L 73.7,271.0 L 73.2,271.1 L 74.0,273.4 L 73.1,272.7 L 72.9,275.1 L 72.4,274.7 L 72.5,274.2 L 72.1,273.8 L 72.4,274.2 L 72.3,274.7 L 72.6,275.0 L 71.8,278.1 L 72.2,275.3 L 69.8,277.3 L 72.3,282.9 L 68.6,288.0 L 69.2,289.7 L 59.8,293.6 L 58.6,294.9 L 57.6,294.8 L 52.8,297.0 L 51.1,296.9 L 51.6,297.3 L 51.3,297.5 L 49.7,297.4 L 50.4,296.8 L 49.7,297.1 L 49.5,296.7 L 49.4,296.7 L 49.7,297.4 L 48.9,297.7 L 42.8,295.1 L 37.5,291.1 L 31.4,284.5 L 32.2,283.7 L 31.8,282.5 L 30.1,282.7 L 31.3,284.3 L 29.4,283.0 L 19.1,272.2 L 21.2,269.5 L 21.2,270.8 L 23.2,270.3 L 22.6,272.1 L 23.8,273.0 L 27.8,271.7 L 28.0,270.2 L 29.2,272.0 L 31.6,269.6 L 32.7,270.7 L 38.5,268.3 L 39.7,266.6 L 39.9,265.5 L 40.7,265.1 L 41.5,263.3 L 42.6,262.3 L 43.3,261.1 L 43.7,260.1 L 42.8,260.3 L 42.2,260.8 L 41.4,262.3 L 38.3,260.8 L 31.3,265.5 L 30.1,264.5 L 27.5,264.8 L 23.1,263.8 L 14.7,258.8 L 13.6,257.6 L 13.8,257.5 L 13.8,257.8 L 14.3,257.9 L 15.0,257.0 L 14.3,256.6 L 15.8,256.6 L 16.2,256.5 L 16.3,256.0 L 14.6,256.5 L 14.5,256.2 L 14.2,255.9 L 14.4,255.9 L 14.4,255.8 L 14.4,255.7 L 12.3,253.9 L 12.6,253.5 L 12.0,252.6 L 16.4,247.5 L 13.9,247.8 L 12.6,249.3 L 12.5,248.2 L 14.8,246.8 L 13.0,246.1 L 16.2,246.1 L 16.6,240.8 L 18.4,242.4 L 29.6,241.1 L 35.6,242.9 L 44.7,238.9 L 45.0,241.5 L 47.4,242.0 L 53.6,239.3 L 51.6,236.9 L 53.4,234.7 L 46.5,223.6 L 46.4,218.7 L 40.3,218.7 L 37.4,214.8 L 38.6,205.3 L 28.1,202.1 L 29.3,195.6 L 41.7,182.3 L 44.8,182.1 L 49.8,187.2 L 65.8,183.1 L 73.5,170.4 L 82.3,166.2 L 89.4,151.8 L 98.3,147.9 L 98.0,143.6 L 109.8,134.0 L 106.9,132.9 L 109.1,127.8 L 107.1,123.7 L 108.4,121.1 L 118.4,118.0 L 120.5,115.6 L 116.1,111.8 L 109.8,111.6 L 110.0,106.1 L 107.4,107.6 L 104.5,103.3 L 99.2,100.4 L 101.9,96.4 L 98.3,92.2 L 103.1,88.2 L 97.1,87.0 L 98.6,83.6 L 95.3,81.9 L 98.4,76.8 L 104.9,75.1 L 126.6,79.7 L 138.0,75.3 L 141.3,75.8 L 142.3,73.2 L 146.3,73.0 L 159.3,64.1 L 163.7,64.4 L 161.9,66.5 L 166.0,76.8 L 177.7,82.8 L 173.2,86.6 L 173.6,93.8 L 179.0,100.0 L 184.3,100.7 L 183.4,103.9 L 186.7,108.7 L 177.5,113.9 L 174.4,111.8 L 173.8,108.3 L 168.6,110.6 L 170.2,112.7 L 169.0,115.4 L 174.2,119.3 L 173.0,122.6 L 175.2,125.4 L 173.4,127.4 L 176.4,131.0 L 179.9,128.2 L 184.3,134.5 L 191.3,135.4 L 197.1,138.8 L 197.0,141.7 L 209.7,146.9 L 199.4,154.8 L 200.1,157.3 L 197.5,159.6 L 198.3,163.4 L 195.9,165.0 L 194.8,169.4 L 201.8,173.7 L 202.6,171.6 L 212.7,176.7 L 214.4,180.3 L 216.4,179.8 L 223.4,184.7 L 226.2,183.6 L 232.2,187.5 L 236.3,186.8 L 236.8,190.2 L 243.9,191.0 L 246.0,193.0 L 247.1,190.6 L 254.5,192.7 L 259.0,190.0 L 266.5,192.8 L 266.8,197.4 L 275.6,200.3 L 275.9,202.0 L 282.5,200.2 L 285.9,205.0 L 293.4,204.2 L 299.8,207.3 L 305.2,204.7 L 305.5,206.8 L 309.4,208.5 L 318.0,206.3 L 320.3,208.2 L 322.8,202.1 L 319.6,196.3 L 322.9,185.7 L 321.7,183.2 L 329.6,180.3 L 333.7,184.6 L 331.9,189.3 L 334.3,193.0 L 331.6,195.9 L 337.6,201.2 L 341.5,200.3 L 347.8,202.9 L 357.8,199.7 L 362.5,201.8 L 383.7,200.6 L 384.7,193.6 L 383.1,190.6 L 377.3,190.5 L 375.6,184.7 L 381.6,186.9 L 386.2,184.6 L 391.7,185.2 L 394.5,182.6 L 393.7,180.4 L 402.1,177.1 L 403.9,172.3 L 413.2,171.8 L 417.8,165.3 L 424.3,161.1 L 427.0,164.0 L 437.2,166.1 L 439.6,162.5 L 447.3,159.4 L 449.8,162.9 L 452.1,162.6 L 447.7,165.4 L 448.5,168.1 L 454.2,165.4 L 455.6,170.1 L 450.1,175.9 L 452.2,177.0 L 456.4,175.1 L 468.0,179.2 L 466.5,181.2 L 467.8,184.0 L 460.1,188.4 L 464.0,196.6 L 457.2,192.2 L 449.6,193.7 L 432.6,204.2 L 431.2,206.8 L 433.1,212.7 L 428.6,220.8 L 424.3,223.6 L 425.7,230.6 L 416.9,247.8 L 410.5,245.3 L 406.6,246.3 L 404.1,243.7 L 404.8,259.1 L 403.3,261.2 L 400.7,260.5 L 401.9,272.9 L 397.2,277.9 L 394.2,274.6 L 392.5,277.4 L 387.2,249.9 L 384.0,251.1 L 382.2,249.8 L 382.4,253.6 L 379.2,257.1 L 380.2,259.8 L 376.8,262.1 L 373.7,256.8 L 373.0,260.2 L 369.7,251.8 L 373.0,243.8 L 376.5,244.2 L 377.6,241.8 L 379.1,243.3 L 378.8,241.6 L 381.3,243.3 L 381.6,240.2 L 385.5,238.8 L 386.7,231.1 L 390.6,231.7 L 389.7,229.2 L 384.0,226.7 L 358.4,227.4 L 348.7,225.1 L 349.6,214.9 L 348.6,214.8 L 349.3,214.3 L 346.3,211.4 L 346.3,210.2 L 344.7,214.4 L 341.1,213.8 L 338.1,211.7 L 337.1,207.7 L 335.0,206.6 L 334.3,208.1 L 336.6,209.9 L 333.1,210.2 L 326.1,204.1 L 325.0,206.4 L 328.0,208.3 L 322.6,211.6 L 321.6,217.2 L 324.0,217.0 L 328.3,221.7 L 332.5,221.5 L 335.7,225.1 L 334.3,227.1 L 326.8,226.6 L 326.1,230.6 L 322.0,230.7 L 319.9,235.0 L 325.0,239.4 L 331.4,241.2 L 331.9,245.7 L 328.8,247.7 L 328.6,251.1 L 332.3,253.4 L 331.1,257.3 L 335.4,257.9 L 333.1,261.2 L 334.7,266.6 L 332.5,265.2 L 334.5,268.0 L 333.9,268.1 L 333.5,268.4 L 333.0,269.0 L 333.2,270.2 L 331.8,268.2 L 330.4,268.1 L 332.0,269.0 L 332.1,269.2 L 332.4,270.0 L 332.7,270.2 L 333.1,270.2 L 333.1,270.9 L 333.3,271.3 L 333.6,271.4 L 333.6,271.4 L 333.5,271.4 L 333.1,271.3 L 332.7,271.3 L 331.3,273.9 L 330.8,273.7 L 330.3,273.6 L 329.8,273.6 L 330.1,273.2 L 330.6,272.4 L 330.6,271.9 L 330.3,271.7 L 329.7,273.5 L 329.8,273.7 L 330.4,273.8 L 329.5,275.3 L 329.3,274.5 L 328.8,274.0 L 329.3,278.4 L 328.4,277.4 L 328.8,278.5 L 328.6,278.6 L 328.4,278.5 L 328.3,278.5 L 328.1,279.3 L 327.6,278.9 L 328.0,278.4 L 328.0,278.1 L 328.0,277.9 L 327.5,277.5 L 327.9,277.2 L 328.2,277.4 L 328.3,277.3 L 328.4,277.1 L 328.5,276.7 L 328.5,276.5 L 327.5,277.5 L 328.0,278.4 L 327.7,278.4 L 327.4,278.4 L 327.3,278.5 L 327.2,278.7 L 327.2,277.7 L 327.1,277.6 L 326.8,277.6 L 327.0,276.8 L 326.2,278.8 L 325.8,278.6 L 326.2,278.3 L 326.0,277.5 L 325.7,277.5 L 325.9,280.2 L 325.4,279.8 L 325.6,278.6 L 325.6,278.5 L 325.4,278.3 L 325.3,278.2 L 323.8,279.1 L 324.7,279.4 L 324.6,279.7 L 324.1,279.8 L 323.9,280.0 L 323.8,280.1 L 323.8,280.2 L 323.9,280.4 L 324.2,280.8 L 323.7,280.1 L 324.2,280.8 L 323.9,281.3 L 324.1,280.9 L 322.3,278.9 L 323.3,275.8 L 323.0,274.4 L 320.9,273.7 L 321.4,272.2 L 319.5,273.1 L 318.9,270.6 L 318.5,270.2 L 317.9,270.1 L 318.8,272.9 L 319.5,273.6 L 319.9,273.8 L 321.9,274.1 L 322.7,275.5 L 320.7,276.8 L 320.3,276.0 L 319.6,275.4 L 319.1,275.4 L 320.6,276.9 L 316.7,281.7 L 305.7,284.6 L 302.6,287.4 L 301.1,290.0 L 303.4,296.0 L 302.1,296.0 L 301.3,296.4 L 300.1,298.9 L 304.7,297.4 L 300.6,300.1 L 300.5,303.1 L 295.5,306.0 L 296.0,306.1 L 295.5,306.8 L 295.5,306.8 L 295.7,307.0 L 295.5,306.8 L 295.9,306.6 L 296.2,306.0 L 297.0,305.4 L 296.4,305.9 L 295.8,306.8 L 295.1,307.6 L 294.7,307.7 L 294.4,308.9 L 292.8,307.6 L 292.7,307.8 L 292.5,307.6 L 292.4,307.6 L 292.1,307.7 L 292.0,308.1 L 293.6,309.0 L 293.2,309.4 L 294.0,309.3 L 286.7,311.2 L 279.1,314.5 L 268.1,322.1 L 267.8,322.5 L 267.8,322.6 L 267.9,322.6 L 267.9,322.8 L 268.0,322.8 L 268.1,322.9 L 268.7,323.2 L 268.4,323.6 L 258.6,335.2 L 249.9,339.8 L 245.1,344.7 L 244.3,346.6 L 234.7,351.2 L 230.9,354.0 L 229.1,357.0 L 230.7,358.2 L 230.8,356.4 L 230.9,357.4 L 230.5,360.0 L 229.0,360.5 L 229.4,362.7 L 230.0,362.6 L 230.0,362.7 L 220.7,366.7 L 217.9,366.0 L 215.8,366.2 L 215.4,365.9 L 215.1,366.0 L 208.5,376.1 L 206.6,376.2 L 206.3,374.1 L 205.8,373.7 L 204.4,373.5 L 197.9,376.8 L 194.9,382.4 L 195.0,384.0 L 194.3,384.1 L 194.4,386.2 L 196.7,393.9 L 195.5,401.4 L 198.6,412.1 L 197.8,410.1 L 195.9,407.5 L 195.8,409.3 L 195.3,407.8 L 194.4,409.7 L 198.8,413.2 L 198.6,412.3 L 198.7,412.2 L 198.7,412.0 L 198.7,412.0 L 198.7,411.9 L 199.1,414.4 L 196.1,427.4 L 193.9,429.3 L 194.6,429.2 L 192.7,431.2 L 193.7,430.7 L 190.8,436.6 L 190.5,436.6 L 190.3,436.6 L 189.8,441.6 L 190.5,446.8 L 191.3,447.6 L 190.8,453.4 L 191.3,453.2 L 191.8,461.5 L 187.8,460.5 L 187.5,461.3 L 186.5,461.3 L 186.6,461.4 L 188.3,461.7 L 188.5,461.5 L 188.6,461.7 L 189.5,461.9 L 186.1,461.4 L 187.1,461.0 L 186.4,460.8 L 182.4,462.3 L 182.0,465.7 L 176.2,474.3 L 180.8,477.6 L 175.2,477.8 L 172.4,479.5 L 169.8,479.7 L 166.2,481.7 L 164.7,483.9 L 165.7,486.0 L 163.7,487.5 L 163.1,491.9 L 158.1,495.0 L 151.3,495.9 L 139.1,483.6 L 135.9,475.5 L 134.3,466.8 L 135.0,468.9 L 135.6,468.2 L 135.5,468.7 L 135.6,469.3 L 136.0,470.8 L 135.6,468.3 L 136.0,469.0 L 136.4,469.1 L 136.2,469.4 L 136.2,471.0 L 136.8,471.4 L 136.3,472.4 L 136.2,473.7 L 136.6,474.0 L 138.4,473.7 L 137.1,473.2 L 136.8,469.1 L 136.1,467.7 L 135.5,468.0 L 135.6,468.0 L 135.5,467.9 L 135.5,467.8 L 135.5,467.7 L 135.5,467.6 L 135.3,467.3 L 135.4,467.1 L 135.3,467.3 L 135.3,467.4 L 135.3,467.4 L 134.7,465.8 L 134.5,465.8 L 134.7,465.0 L 133.8,463.9 L 133.8,464.8 L 134.2,465.3 L 134.0,465.2 L 134.3,465.8 L 134.2,466.0 L 134.3,466.0 L 134.3,466.3 L 134.3,466.3 L 134.3,466.6 L 134.4,466.7 L 134.1,466.6 L 131.6,457.7 L 129.1,453.8 L 128.3,448.3 L 122.6,437.9 L 119.8,436.2 L 121.1,436.0 L 120.6,435.4 L 119.6,435.5 L 119.2,434.7 L 118.9,434.6 L 120.0,434.6 L 120.1,434.0 L 118.9,434.4 L 118.9,434.7 L 119.5,435.5 L 117.9,434.6 L 118.2,433.6 L 117.8,432.6 L 111.9,421.3 L 109.0,405.6 L 104.9,394.2 L 103.9,395.0 L 103.2,391.9 Z"></path>
+              <g class="map-pin active" data-key="karnataka" data-years="2024-25,2025-26">
+                <circle class="pulse" cx="123.1" cy="387.2" r="13"></circle>
+                <circle class="dot" cx="123.1" cy="387.2" r="10"></circle>
+                <text x="137.1" y="383.2" >Karnataka</text>
+              </g>
+              <g class="map-pin" data-key="maharashtra" data-years="2024-25">
+                <circle class="pulse" cx="121.5" cy="327.2" r="13"></circle>
+                <circle class="dot" cx="121.5" cy="327.2" r="10"></circle>
+                <text x="107.5" y="323.2" text-anchor="end">Maharashtra</text>
+              </g>
+              <g class="map-pin" data-key="rajasthan" data-years="2025-26">
+                <circle class="pulse" cx="96.2" cy="204.1" r="13"></circle>
+                <circle class="dot" cx="96.2" cy="204.1" r="10"></circle>
+                <text x="110.2" y="200.1" >Rajasthan</text>
+              </g>
+              <g class="map-pin" data-key="kerala" data-years="2025-26">
+                <circle class="pulse" cx="137.6" cy="457.7" r="13"></circle>
+                <circle class="dot" cx="137.6" cy="457.7" r="10"></circle>
+                <text x="123.6" y="453.7" text-anchor="end">Kerala</text>
+              </g>
+              <g class="map-pin" data-key="delhi" data-years="2025-26">
+                <circle class="pulse" cx="148.2" cy="172.2" r="13"></circle>
+                <circle class="dot" cx="148.2" cy="172.2" r="10"></circle>
+                <text x="162.2" y="168.2" >Delhi</text>
+              </g>
+              <g class="map-pin" data-key="tamilnadu" data-years="2025-26">
+                <circle class="pulse" cx="167.6" cy="453.6" r="13"></circle>
+                <circle class="dot" cx="167.6" cy="453.6" r="10"></circle>
+                <text x="181.6" y="449.6" >Tamil Nadu</text>
+              </g>
+              <g class="map-pin" data-key="mp" data-years="2025-26">
+                <circle class="pulse" cx="184.0" cy="245.9" r="13"></circle>
+                <circle class="dot" cx="184.0" cy="245.9" r="10"></circle>
+                <text x="198.0" y="241.9" >Madhya Pradesh</text>
+              </g>
+              <g class="map-pin" data-key="gujarat" data-years="2025-26">
+                <circle class="pulse" cx="68.1" cy="270.5" r="13"></circle>
+                <circle class="dot" cx="68.1" cy="270.5" r="10"></circle>
+                <text x="54.099999999999994" y="266.5" text-anchor="end">Gujarat</text>
+              </g>
+            </svg>
+          </div>
+
+          <div>
+            <div class="location-list">              <button class="location-row active" data-key="karnataka" data-years="2024-25,2025-26" type="button"><span>Karnataka</span><span class="count">8</span></button>
+              <button class="location-row" data-key="maharashtra" data-years="2024-25" type="button"><span>Maharashtra</span><span class="count">1</span></button>
+              <button class="location-row" data-key="rajasthan" data-years="2025-26" type="button"><span>Rajasthan</span><span class="count">1</span></button>
+              <button class="location-row" data-key="kerala" data-years="2025-26" type="button"><span>Kerala</span><span class="count">1</span></button>
+              <button class="location-row" data-key="delhi" data-years="2025-26" type="button"><span>Delhi</span><span class="count">1</span></button>
+              <button class="location-row" data-key="tamilnadu" data-years="2025-26" type="button"><span>Tamil Nadu</span><span class="count">1</span></button>
+              <button class="location-row" data-key="mp" data-years="2025-26" type="button"><span>Madhya Pradesh</span><span class="count">1</span></button>
+              <button class="location-row" data-key="gujarat" data-years="2025-26" type="button"><span>Gujarat</span><span class="count">1</span></button>
+            </div>
+            <div class="location-detail active" data-detail="karnataka">
+              <div class="year-group" data-year="2024-25">
+                <div class="year">FY 2024–25</div>
+                <ul>
+                  <li>Upgrade of Neo-Natal and Pediatrics care facility — Sri Sathya Sai Sarla Memorial Hospital — Karnataka <span class="status-tag completed">Completed</span></li>
+                  <li>Promoting the use of AI for eyecare and upskilling of students — Bangalore, Karnataka <span class="status-tag inprogress">In progress</span></li>
+                </ul>
+              </div>
+              <div class="year-group" data-year="2025-26">
+                <div class="year">FY 2025–26</div>
+                <ul>
+                  <li>Asha Kirana — Aloka Vision Programme, Kalaburagi — Kalaburagi, Karnataka <span class="status-tag completed">Completed</span></li>
+                  <li>Bridging Language Barriers for Disadvantaged Children — Karnataka <span class="status-tag completed">Completed</span></li>
+                  <li>Advanced Microscopy Course to Empower Students — Karnataka <span class="status-tag completed">Completed</span></li>
+                  <li>Kingdom of Childhood School — Karnataka <span class="status-tag completed">Completed</span></li>
+                  <li>Installation of a 5 kW solar power system — Sai Ranga Vidya Samsthe — Mysuru, Karnataka <span class="status-tag completed">Completed</span></li>
+                  <li>Benches Of Hope — Karnataka <span class="status-tag inprogress">In progress</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="location-detail" data-detail="maharashtra">
+              <div class="year-group" data-year="2024-25">
+                <div class="year">FY 2024–25</div>
+                <ul>
+                  <li>Sponsorship of skill development programs and Faculty development Programs for staff members — Maharashtra <span class="status-tag completed">Completed</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="location-detail" data-detail="rajasthan">
+              <div class="year-group" data-year="2025-26">
+                <div class="year">FY 2025–26</div>
+                <ul>
+                  <li>High-density forest plantation — Pali, Rajasthan — Pali, Rajasthan <span class="status-tag inprogress">In progress</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="location-detail" data-detail="kerala">
+              <div class="year-group" data-year="2025-26">
+                <div class="year">FY 2025–26</div>
+                <ul>
+                  <li>AYUSH Panchakarma Nurse Training — Wayanad, Kerala <span class="status-tag completed">Completed</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="location-detail" data-detail="delhi">
+              <div class="year-group" data-year="2025-26">
+                <div class="year">FY 2025–26</div>
+                <ul>
+                  <li>Development of Neurosurgical Simulators with AI-Based Skill Assessment — Delhi <span class="status-tag inprogress">In progress</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="location-detail" data-detail="tamilnadu">
+              <div class="year-group" data-year="2025-26">
+                <div class="year">FY 2025–26</div>
+                <ul>
+                  <li>AI innovations in Vision Care — Chennai, Tamil Nadu <span class="status-tag inprogress">In progress</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="location-detail" data-detail="mp">
+              <div class="year-group" data-year="2025-26">
+                <div class="year">FY 2025–26</div>
+                <ul>
+                  <li>Upgrading and Expanding 5 Vision Centers with Comprehensive Eye Care and Teleconsultation Facilities — Madhya Pradesh <span class="status-tag completed">Completed</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="location-detail" data-detail="gujarat">
+              <div class="year-group" data-year="2025-26">
+                <div class="year">FY 2025–26</div>
+                <ul>
+                  <li>Eyecare — Aloka Vision Programme — Gujarat <span class="status-tag inprogress">In progress</span></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STOP 5: Story in numbers -->
+    <section class="stop wide" data-stop="4">
+      <div class="card card--numbers">
+        <svg class="stop-art-corner" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="90" stroke="#8FB02A" stroke-width="1.5" fill="none"></circle>
+          <circle cx="100" cy="100" r="65" stroke="#8FB02A" stroke-width="1.5" fill="none"></circle>
+          <circle cx="100" cy="100" r="40" stroke="#8FB02A" stroke-width="1.5" fill="none"></circle>
+        </svg>
+        <h2 style="margin-bottom:14px;">Our impact, so far</h2>
+        <p class="stat-intro">Our CSR initiative, focused on creating meaningful social and environmental impact, has made significant progress. This snapshot highlights a successful effort that's delivering positive change for communities and reinforcing our commitment to responsible growth.</p>
+        <div class="stat-grid">
+          <div class="stat"><div class="num">320K+</div><div class="tag">Trees planted</div><div class="sub">Across 10+ locations</div></div>
+          <div class="stat"><div class="num">8,500+</div><div class="tag">Students impacted</div><div class="sub">Through education programs</div></div>
+          <div class="stat"><div class="num">25,000+</div><div class="tag">Volunteer hours</div><div class="sub">Contributed by our people</div></div>
+          <div class="stat"><div class="num">35+</div><div class="tag">Community programs</div><div class="sub">Completed last year</div></div>
+          <div class="stat"><div class="num">1,00,000+</div><div class="tag">Patients screened</div><div class="sub">Contributed by our people</div></div>
+          <div class="stat"><div class="num">150+</div><div class="tag">Teachers trained</div><div class="sub">Contributed by our team</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STOP: Project status by sector -->
+    <section class="stop wide" data-stop="4b">
+      <div class="card">
+        <h2 style="margin-bottom:6px;">Project status by sector</h2>
+        <p style="color:var(--muted); font-size:0.92rem; margin-bottom:26px;">Completed vs. in-progress projects, and how each sector split across the two financial years.</p>
+        <div class="chart-grid">
+
+          <div class="chart-card">
+            <h3>Healthcare</h3>
+            <div class="donut">
+              <svg viewBox="0 0 120 120">
+                <circle class="donut-track" cx="60" cy="60" r="50"></circle>
+                <circle class="donut-seg" cx="60" cy="60" r="50" stroke="var(--forest)"
+                        stroke-dasharray="134.64 179.52" stroke-dashoffset="0"
+                        transform="rotate(-90 60 60)"></circle>
+                <circle class="donut-seg" cx="60" cy="60" r="50" stroke="#D9A544"
+                        stroke-dasharray="179.52 134.64" stroke-dashoffset="-134.64"
+                        transform="rotate(-90 60 60)"></circle>
+              </svg>
+              <div class="donut-total"><span class="n">7</span><span class="l">Projects</span></div>
+            </div>
+            <div class="chart-legend">
+              <span><i class="dot completed"></i>Completed 3</span>
+              <span><i class="dot inprogress"></i>In progress 4</span>
+            </div>
+            <div class="year-bars">
+              <div class="ybar-row">
+                <span class="ybar-label">FY 2024–25</span>
+                <span class="ybar-track"><span class="ybar-fill" style="width:40%;"></span></span>
+                <span class="ybar-count">2</span>
+              </div>
+              <div class="ybar-row">
+                <span class="ybar-label">FY 2025–26</span>
+                <span class="ybar-track"><span class="ybar-fill" style="width:100%;"></span></span>
+                <span class="ybar-count">5</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <h3>Education</h3>
+            <div class="donut">
+              <svg viewBox="0 0 120 120">
+                <circle class="donut-track" cx="60" cy="60" r="50"></circle>
+                <circle class="donut-seg" cx="60" cy="60" r="50" stroke="var(--forest)"
+                        stroke-dasharray="314.16 0" stroke-dashoffset="0"
+                        transform="rotate(-90 60 60)"></circle>
+              </svg>
+              <div class="donut-total"><span class="n">5</span><span class="l">Projects</span></div>
+            </div>
+            <div class="chart-legend">
+              <span><i class="dot completed"></i>Completed 5</span>
+              <span><i class="dot inprogress"></i>In progress 0</span>
+            </div>
+            <div class="year-bars">
+              <div class="ybar-row">
+                <span class="ybar-label">FY 2024–25</span>
+                <span class="ybar-track"><span class="ybar-fill" style="width:20%;"></span></span>
+                <span class="ybar-count">1</span>
+              </div>
+              <div class="ybar-row">
+                <span class="ybar-label">FY 2025–26</span>
+                <span class="ybar-track"><span class="ybar-fill" style="width:80%;"></span></span>
+                <span class="ybar-count">4</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <h3>Sustainability</h3>
+            <div class="donut">
+              <svg viewBox="0 0 120 120">
+                <circle class="donut-track" cx="60" cy="60" r="50"></circle>
+                <circle class="donut-seg" cx="60" cy="60" r="50" stroke="var(--forest)"
+                        stroke-dasharray="104.72 209.44" stroke-dashoffset="0"
+                        transform="rotate(-90 60 60)"></circle>
+                <circle class="donut-seg" cx="60" cy="60" r="50" stroke="#D9A544"
+                        stroke-dasharray="209.44 104.72" stroke-dashoffset="-104.72"
+                        transform="rotate(-90 60 60)"></circle>
+              </svg>
+              <div class="donut-total"><span class="n">3</span><span class="l">Projects</span></div>
+            </div>
+            <div class="chart-legend">
+              <span><i class="dot completed"></i>Completed 1</span>
+              <span><i class="dot inprogress"></i>In progress 2</span>
+            </div>
+            <div class="year-bars">
+              <div class="ybar-row">
+                <span class="ybar-label">FY 2024–25</span>
+                <span class="ybar-track"><span class="ybar-fill" style="width:0%;"></span></span>
+                <span class="ybar-count">0</span>
+              </div>
+              <div class="ybar-row">
+                <span class="ybar-label">FY 2025–26</span>
+                <span class="ybar-track"><span class="ybar-fill" style="width:60%;"></span></span>
+                <span class="ybar-count">3</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- STOP 5: Video carousel (3 slots) -->
+    <section class="stop wide" data-stop="4">
+      <div class="card">
+        <h2 style="margin-bottom:22px;">See it in motion</h2>
+        <div class="carousel" data-carousel>
+          <div class="carousel-scroller">
+            <div class="carousel-card">
+              <div class="media-box"><div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
+              <div class="carousel-caption"><h3>Video 01</h3><p>Caption goes here</p></div>
+            </div>
+            <div class="carousel-card">
+              <div class="media-box"><div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
+              <div class="carousel-caption"><h3>Video 02</h3><p>Caption goes here</p></div>
+            </div>
+            <div class="carousel-card">
+              <div class="media-box"><div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
+              <div class="carousel-caption"><h3>Video 03</h3><p>Caption goes here</p></div>
+            </div>
+          </div>
+          <div class="carousel-controls">
+            <button class="carousel-arrow" data-prev aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <button class="carousel-arrow" data-next aria-label="Next"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STOP 6: Meet the team -->
+    <section class="stop wide" data-stop="5">
+      <div class="card">
+        <h2 style="margin-bottom:6px;">Meet the team</h2>
+        <p style="color:var(--muted); font-size:0.92rem; margin-bottom:22px;">Tap a card to flip it.</p>
+        <div class="team-grid">
+          <button class="member" type="button">
+            <div class="member-inner">
+              <div class="member-face front">
+                <div class="avatar" style="background:#2F5233;">EW</div>
+                <h3>Elliot Woodward</h3>
+                <div class="role">Product Manager</div>
+              </div>
+              <div class="member-face back">
+                <p>Leads CSR project delivery end to end, from planning through on-ground execution.</p>
+                <div class="flip-hint">tap to flip back</div>
+              </div>
+            </div>
+          </button>
+          <button class="member" type="button">
+            <div class="member-inner">
+              <div class="member-face front">
+                <div class="avatar" style="background:#8FB02A;">KA</div>
+                <h3>Katri Ahokas</h3>
+                <div class="role">Lead Designer</div>
+              </div>
+              <div class="member-face back">
+                <p>Shapes how the CSR story is told — from campaign visuals to this very site.</p>
+                <div class="flip-hint">tap to flip back</div>
+              </div>
+            </div>
+          </button>
+          <button class="member" type="button">
+            <div class="member-inner">
+              <div class="member-face front">
+                <div class="avatar" style="background:#5B6B5D;">SR</div>
+                <h3>Serena Ribeiro</h3>
+                <div class="role">Product Designer</div>
+              </div>
+              <div class="member-face back">
+                <p>Designs the touchpoints communities actually interact with, on the ground and online.</p>
+                <div class="flip-hint">tap to flip back</div>
+              </div>
+            </div>
+          </button>
+          <button class="member" type="button">
+            <div class="member-inner">
+              <div class="member-face front">
+                <div class="avatar" style="background:#1F3B24;">RT</div>
+                <h3>Robert Tolbert</h3>
+                <div class="role">Senior User Researcher</div>
+              </div>
+              <div class="member-face back">
+                <p>Talks to the communities we work with to make sure programs meet real needs.</p>
+                <div class="flip-hint">tap to flip back</div>
+              </div>
+            </div>
+          </button>
+          <button class="member" type="button">
+            <div class="member-inner">
+              <div class="member-face front">
+                <div class="avatar" style="background:#6B8F3A;">AM</div>
+                <h3>Ananya Menon</h3>
+                <div class="role">Sustainability Lead</div>
+              </div>
+              <div class="member-face back">
+                <p>Runs the tree plantation and environmental restoration programs across sites.</p>
+                <div class="flip-hint">tap to flip back</div>
+              </div>
+            </div>
+          </button>
+          <button class="member" type="button">
+            <div class="member-inner">
+              <div class="member-face front">
+                <div class="avatar" style="background:#3F5E3F;">AV</div>
+                <h3>Arjun Verma</h3>
+                <div class="role">Community Partnerships</div>
+              </div>
+              <div class="member-face back">
+                <p>Builds and maintains the on-ground partnerships that make each project possible.</p>
+                <div class="flip-hint">tap to flip back</div>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STOP 7: Success stories carousel (video-capable, 3 slots) -->
+    <section class="stop wide" data-stop="6">
+      <div class="card">
+        <h2 style="margin-bottom:22px;">Our success stories</h2>
+        <div class="carousel" data-carousel>
+          <div class="carousel-scroller">
+            <div class="carousel-card">
+              <div class="media-box photo" data-photo="images/sairanga-solar.jpg">
+                <img src="images/sairanga-solar.jpg" alt="Rooftop solar installation at Sai Ranga Vidya Samsthe">
+              </div>
+              <div class="carousel-caption"><h3>Powering the campus with solar</h3><p>Sai Ranga Vidya Samsthe, Mysuru — a 5 kW rooftop solar system now supports the residential campus for hearing-impaired children.</p></div>
+            </div>
+            <div class="carousel-card">
+              <div class="media-box photo" data-photo="images/sairanga-lab.jpg">
+                <img src="images/sairanga-lab.jpg" alt="Computer lab at Sai Ranga Vidya Samsthe">
+              </div>
+              <div class="carousel-caption"><h3>A computer lab for every student</h3><p>Sai Ranga Vidya Samsthe, Mysuru — equipped workstations give students hands-on digital learning access.</p></div>
+            </div>
+            <div class="carousel-card">
+              <div class="media-box photo" data-photo="images/sairanga-classroom.jpg">
+                <img src="images/sairanga-classroom.jpg" alt="Classroom session at Sai Ranga Vidya Samsthe">
+              </div>
+              <div class="carousel-caption"><h3>Learning, every single day</h3><p>Sai Ranga Vidya Samsthe, Mysuru — inside a typical classroom session on campus.</p></div>
+            </div>
+          </div>
+          <div class="carousel-controls">
+            <button class="carousel-arrow" data-prev aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <button class="carousel-arrow" data-next aria-label="Next"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Close">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="lightbox-content">
+      <div class="media-box" id="lightboxMedia">
+        <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+      <h3 class="lightbox-title" id="lightboxTitle"></h3>
+    </div>
+  </div>
+
+<script>
+(function(){
+  if (window.self !== window.top){
+    document.body.classList.add('embedded');
+  }
+  var stage = document.getElementById('stage');
+  var svg = document.getElementById('pathsvg');
+  var trackPath = document.getElementById('trackPath');
+  var drawPath = document.getElementById('drawPath');
+  var marker = document.getElementById('marker');
+  var petals = document.getElementById('petals');
+  var stops = Array.prototype.slice.call(document.querySelectorAll('.stop'));
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+
+  var pathLength = 0;
+
+  function buildPath(){
+    var w = stage.clientWidth;
+    var h = stage.scrollHeight;
+    svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    svg.style.height = h + 'px';
+
+    var amp = Math.min(w * 0.30, 220);
+    var cx = w / 2;
+
+    var waypoints = stops.map(function(stop, i){
+      var rect = stop.getBoundingClientRect();
+      var stageRect = stage.getBoundingClientRect();
+      var y = rect.top - stageRect.top + rect.height / 2;
+      var side = i % 2 === 0 ? -1 : 1;
+      var x = stop.classList.contains('wide') ? cx : cx + side * amp;
+      return {x: x, y: y};
+    });
+
+    var start = {x: cx, y: 0};
+    var end = {x: cx, y: h};
+    var pts = [start].concat(waypoints).concat([end]);
+
+    var d = 'M ' + pts[0].x + ' ' + pts[0].y + ' ';
+    for (var i = 0; i < pts.length - 1; i++){
+      var p0 = pts[i === 0 ? 0 : i - 1];
+      var p1 = pts[i];
+      var p2 = pts[i + 1];
+      var p3 = pts[i + 2 < pts.length ? i + 2 : i + 1];
+      var c1x = p1.x + (p2.x - p0.x) / 6;
+      var c1y = p1.y + (p2.y - p0.y) / 6;
+      var c2x = p2.x - (p3.x - p1.x) / 6;
+      var c2y = p2.y - (p3.y - p1.y) / 6;
+      d += 'C ' + c1x + ' ' + c1y + ', ' + c2x + ' ' + c2y + ', ' + p2.x + ' ' + p2.y + ' ';
+    }
+
+    trackPath.setAttribute('d', d);
+    drawPath.setAttribute('d', d);
+    pathLength = drawPath.getTotalLength();
+    drawPath.style.strokeDasharray = pathLength;
+    drawPath.style.strokeDashoffset = pathLength;
+  }
+
+  var lastY = window.scrollY;
+  var bladeTarget = 0;
+
+  function onScroll(){
+    var stageRect = stage.getBoundingClientRect();
+    var stageTop = window.scrollY + stageRect.top;
+    var stageHeight = stage.scrollHeight;
+    var viewportMid = window.scrollY + window.innerHeight * 0.5;
+
+    var progress = (viewportMid - stageTop) / stageHeight;
+    progress = Math.max(0, Math.min(1, progress));
+
+    var offset = pathLength * (1 - progress);
+    drawPath.style.strokeDashoffset = offset;
+
+    var pt = drawPath.getPointAtLength(pathLength * progress);
+    marker.style.transform = 'translate(' + pt.x + 'px,' + pt.y + 'px)';
+
+    var dy = window.scrollY - lastY;
+    lastY = window.scrollY;
+    bladeTarget = Math.max(-1, Math.min(1, dy / 40));
+  }
+
+  var bladeAngle = 0;
+  function raf(){
+    bladeAngle += (bladeTarget - bladeAngle) * 0.15;
+    bladeTarget *= 0.9;
+    petals.querySelectorAll('.petal').forEach(function(petal, i){
+      var base = i * 60;
+      petal.style.transform = 'rotate(' + base + 'deg) scale(' + (1 + Math.abs(bladeAngle) * 0.12) + ')';
+    });
+    requestAnimationFrame(raf);
+  }
+
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, {threshold: 0.25});
+  cards.forEach(function(c){ io.observe(c); });
+
+  window.addEventListener('resize', buildPath);
+  window.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('load', function(){ buildPath(); onScroll(); });
+
+  buildPath();
+  onScroll();
+  requestAnimationFrame(raf);
+
+  // ---------- Project map ----------
+  document.querySelectorAll('.map-wrap').forEach(function(wrap){
+    var pins = Array.prototype.slice.call(wrap.querySelectorAll('.map-pin'));
+    var rows = Array.prototype.slice.call(wrap.querySelectorAll('.location-row'));
+    var details = Array.prototype.slice.call(wrap.querySelectorAll('.location-detail'));
+
+    function activate(key){
+      pins.forEach(function(p){ p.classList.toggle('active', p.getAttribute('data-key') === key); });
+      rows.forEach(function(r){ r.classList.toggle('active', r.getAttribute('data-key') === key); });
+      details.forEach(function(d){ d.classList.toggle('active', d.getAttribute('data-detail') === key); });
+      buildPath(); onScroll();
+    }
+    pins.forEach(function(p){ p.addEventListener('click', function(){ activate(p.getAttribute('data-key')); }); });
+    rows.forEach(function(r){ r.addEventListener('click', function(){ activate(r.getAttribute('data-key')); }); });
+
+    var chips = Array.prototype.slice.call(wrap.parentElement.querySelectorAll('.year-chip'));
+    chips.forEach(function(chip){
+      chip.addEventListener('click', function(){
+        chips.forEach(function(c){ c.classList.remove('active'); });
+        chip.classList.add('active');
+        var year = chip.getAttribute('data-year');
+
+        pins.forEach(function(p){
+          var years = (p.getAttribute('data-years') || '').split(',');
+          p.classList.toggle('dim', year !== 'all' && years.indexOf(year) === -1);
+        });
+        rows.forEach(function(r){
+          var years = (r.getAttribute('data-years') || '').split(',');
+          r.classList.toggle('dim', year !== 'all' && years.indexOf(year) === -1);
+        });
+        details.forEach(function(d){
+          var groups = Array.prototype.slice.call(d.querySelectorAll('.year-group'));
+          var anyVisible = false;
+          groups.forEach(function(g){
+            var match = year === 'all' || g.getAttribute('data-year') === year;
+            g.style.display = match ? '' : 'none';
+            if (match) anyVisible = true;
+          });
+          var existingNote = d.querySelector('.empty-note');
+          if (!anyVisible && !existingNote){
+            var note = document.createElement('p');
+            note.className = 'empty-note';
+            note.textContent = 'No projects here in ' + year + '.';
+            d.appendChild(note);
+          } else if (anyVisible && existingNote){
+            existingNote.remove();
+          }
+        });
+        buildPath(); onScroll();
+      });
+    });
+  });
+
+  // ---------- Team flip cards ----------
+  document.querySelectorAll('.member').forEach(function(m, i){
+    m.style.setProperty('--i', i);
+    m.addEventListener('click', function(){ m.classList.toggle('flipped'); });
+  });
+
+  // ---------- Video / media lightbox ----------
+  var lightbox = document.getElementById('lightbox');
+  var lightboxTitle = document.getElementById('lightboxTitle');
+  var lightboxMedia = document.getElementById('lightboxMedia');
+  var VIDEO_PLACEHOLDER_HTML = '<div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
+  function openLightbox(title, photoSrc){
+    lightboxTitle.textContent = title || '';
+    if (photoSrc){
+      lightboxMedia.classList.add('photo');
+      lightboxMedia.innerHTML = '<img src="' + photoSrc + '" alt="' + (title || '') + '">';
+    } else {
+      lightboxMedia.classList.remove('photo');
+      lightboxMedia.innerHTML = VIDEO_PLACEHOLDER_HTML;
+    }
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox(){
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.querySelectorAll('.carousel .media-box').forEach(function(box){
+    box.addEventListener('click', function(){
+      var caption = box.parentElement.querySelector('.carousel-caption h3');
+      var photoSrc = box.getAttribute('data-photo');
+      openLightbox(caption ? caption.textContent : '', photoSrc);
+    });
+  });
+  document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', function(e){ if (e.target === lightbox) closeLightbox(); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeLightbox(); });
+
+  // ---------- Project detail popovers (tap fallback for touch devices) — pillar panels only, not the map ----------
+  document.querySelectorAll('.project-list .proj').forEach(function(p){
+    p.addEventListener('click', function(e){
+      // avoid toggling twice if the details panel itself was clicked (e.g. scrolling long text)
+      if (e.target.closest('.proj-details')) return;
+      var wasOpen = p.classList.contains('expanded');
+      document.querySelectorAll('.project-list .proj.expanded').forEach(function(o){ if (o !== p) o.classList.remove('expanded'); });
+      p.classList.toggle('expanded', !wasOpen);
+    });
+  });
+  document.addEventListener('click', function(e){
+    if (!e.target.closest('.project-list .proj')) {
+      document.querySelectorAll('.project-list .proj.expanded').forEach(function(o){ o.classList.remove('expanded'); });
+    }
+  });
+
+  // ---------- Per-pillar "Learn more" year filters ----------
+  document.querySelectorAll('.panel-filter').forEach(function(filterBar){
+    var list = filterBar.closest('.project-list');
+    var chips = Array.prototype.slice.call(filterBar.querySelectorAll('.panel-chip'));
+    chips.forEach(function(chip){
+      chip.addEventListener('click', function(){
+        chips.forEach(function(c){ c.classList.remove('active'); });
+        chip.classList.add('active');
+        var year = chip.getAttribute('data-year');
+        var groups = Array.prototype.slice.call(list.querySelectorAll('.year-group'));
+        groups.forEach(function(g){
+          g.style.display = (year === 'all' || g.getAttribute('data-year') === year) ? '' : 'none';
+        });
+        buildPath(); onScroll();
+      });
+    });
+  });
+
+  // ---------- Expandable year-wise project lists ----------
+  document.querySelectorAll('[data-toggle]').forEach(function(btn){
+    var panel = document.getElementById(btn.getAttribute('data-toggle'));
+    btn.addEventListener('click', function(){
+      var isExpanded = panel.classList.toggle('expanded');
+      btn.textContent = isExpanded ? 'Show less ↑' : 'Learn more →';
+      buildPath(); onScroll();
+      panel.addEventListener('transitionend', function handler(e){
+        if (e.propertyName !== 'max-height') return;
+        buildPath(); onScroll();
+        panel.removeEventListener('transitionend', handler);
+      });
+    });
+  });
+
+  // ---------- Carousels (multi-card peek, scroll-driven) ----------
+  document.querySelectorAll('[data-carousel]').forEach(function(root){
+    var scroller = root.querySelector('.carousel-scroller');
+    var cards = Array.prototype.slice.call(root.querySelectorAll('.carousel-card'));
+    var prevBtn = root.querySelector('[data-prev]');
+    var nextBtn = root.querySelector('[data-next]');
+
+    function step(){
+      var card = cards[0];
+      var gap = parseFloat(getComputedStyle(scroller).columnGap || getComputedStyle(scroller).gap || 20);
+      return card.getBoundingClientRect().width + gap;
+    }
+    function updateArrows(){
+      var max = scroller.scrollWidth - scroller.clientWidth - 2;
+      prevBtn.disabled = scroller.scrollLeft <= 2;
+      nextBtn.disabled = scroller.scrollLeft >= max;
+    }
+    prevBtn.addEventListener('click', function(){ scroller.scrollBy({left: -step(), behavior:'smooth'}); });
+    nextBtn.addEventListener('click', function(){ scroller.scrollBy({left: step(), behavior:'smooth'}); });
+    scroller.addEventListener('scroll', updateArrows, {passive:true});
+    window.addEventListener('resize', updateArrows);
+    updateArrows();
+  });
+})();
+</script>
+</body>
+</html>
