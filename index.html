@@ -644,19 +644,18 @@
     .scroll-cue .stem{ animation:none; }
   }
 
-/* ===== PREMIUM STORY EXPERIENCE ===== */
+/* FINAL PREMIUM UPDATE */
 .phrase-headline span{display:block;opacity:0;transform:translateY(28px);animation:phraseIn .85s cubic-bezier(.2,.8,.2,1) forwards}.phrase-headline span:nth-child(1){animation-delay:.15s}.phrase-headline span:nth-child(2){animation-delay:.48s}.phrase-headline span:nth-child(3){animation-delay:.81s}.phrase-headline .bold{font-weight:700}@keyframes phraseIn{to{opacity:1;transform:none}}
-.hero{min-height:100vh;background-position:center;background-attachment:fixed}.hero::after{content:"";position:absolute;inset:auto 0 0;height:26vh;background:linear-gradient(transparent,var(--bg));pointer-events:none}.hero-inner{z-index:2}
-.story-morph{height:220vh;position:relative}.story-sticky{height:100vh;position:sticky;top:0;overflow:hidden}.story-panorama{position:absolute;inset:6vh 4vw 9vh;border-radius:28px;overflow:hidden;box-shadow:0 35px 70px -35px #07120a;transform-origin:50% 15%;will-change:transform}.story-panorama img{width:100%;height:100%;object-fit:cover;display:block}.story-panorama:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,12,7,.02),rgba(4,12,7,.58))}.story-portrait{position:absolute;z-index:3;left:50%;bottom:3vh;width:min(27vw,310px);aspect-ratio:1/1.15;border:6px solid var(--bg);border-radius:24px;overflow:hidden;box-shadow:0 28px 54px -20px rgba(0,0,0,.55);transform:translateX(-50%);will-change:left,bottom,transform}.story-portrait img{width:100%;height:100%;object-fit:cover}.story-copy{position:absolute;z-index:4;left:45%;right:7vw;top:46%;opacity:0;transform:translateY(35px)}.story-copy h2{font-size:clamp(2.2rem,5vw,4.8rem);line-height:1.02}.story-copy p{font-size:1.05rem;line-height:1.7;color:var(--muted);max-width:56ch}
-.path-icon-layer{position:absolute;inset:0;pointer-events:none;z-index:2}.path-icon{position:absolute;width:58px;height:58px;margin:-29px;border:2px solid var(--path);border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 15px 28px -16px rgba(14,29,18,.5);opacity:0;transform:scale(.5) rotate(-18deg);transition:.55s cubic-bezier(.2,.9,.2,1)}.path-icon.visible{opacity:1;transform:scale(1) rotate(0)}.path-icon svg{width:29px;height:29px;fill:none;stroke:var(--forest);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.pillar-image{transition:transform 1.2s cubic-bezier(.2,.8,.2,1),filter .8s}.card:hover .pillar-image{transform:scale(1.035);filter:saturate(1.08)}.card{overflow:hidden}.stop:not(.wide):nth-of-type(odd) .card{margin-left:0;margin-right:auto}.stop:not(.wide):nth-of-type(even) .card{margin-left:auto;margin-right:0}
-.dual-story{display:grid;grid-template-columns:1.12fr .88fr;gap:18px;margin:18px 0 22px}.dual-story figure{margin:0;border-radius:16px;overflow:hidden;position:relative}.dual-story figure:first-child{height:290px}.dual-story figure:last-child{height:220px;align-self:end}.dual-story img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.2s}.dual-story figure:hover img{transform:scale(1.06)}
-.leader-row,.leader-row.reverse{display:block;position:relative;min-height:560px;border-radius:24px;overflow:hidden;background:#0e1d12}.leader-photo-slot,.leader-row.reverse .leader-photo-slot{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;border-radius:0;opacity:0;transform:scale(1.08);transition:opacity .9s,transform 1.5s cubic-bezier(.2,.8,.2,1)}.leader-row.visible .leader-photo-slot{opacity:1;transform:scale(1)}.leader-photo-slot:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,18,11,.92),rgba(8,18,11,.55) 50%,rgba(8,18,11,.05))}.leader-text{position:absolute;z-index:2;left:7%;top:50%;transform:translateY(-50%);width:min(55%,590px);color:#fff}.leader-text blockquote{color:#fff;font-size:clamp(1.5rem,3vw,2.55rem);line-height:1.35;text-shadow:0 2px 16px rgba(0,0,0,.4)}.leader-title{color:rgba(255,255,255,.72)}
-.impact-gallery{display:grid;grid-template-columns:1.3fr .7fr;gap:16px;margin:0 0 30px}.impact-gallery .big{grid-row:span 2;height:430px}.impact-gallery .small{height:207px}.impact-gallery figure{margin:0;border-radius:18px;overflow:hidden;position:relative}.impact-gallery img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.2s}.impact-gallery figure:hover img{transform:scale(1.055)}
-.carousel-card{transition:transform .35s,opacity .35s}.carousel-card:hover{transform:translateY(-8px) rotate(.3deg)}.media-box.photo img{transition:transform 1s}.media-box.photo:hover img{transform:scale(1.07)}
-.reveal-photo{opacity:0;transform:translateY(34px) scale(.97);transition:opacity .8s,transform .9s cubic-bezier(.2,.8,.2,1)}.reveal-photo.visible{opacity:1;transform:none}
-@media(max-width:760px){.hero{background-attachment:scroll}.story-panorama{inset:4vh 3vw 19vh}.story-portrait{width:43vw}.story-copy{left:43%;right:4vw;top:50%}.story-copy h2{font-size:1.75rem}.story-copy p{font-size:.86rem}.dual-story,.impact-gallery{grid-template-columns:1fr}.dual-story figure:first-child,.dual-story figure:last-child,.impact-gallery .big,.impact-gallery .small{height:240px}.leader-row,.leader-row.reverse{min-height:500px}.leader-text{left:7%;right:7%;width:auto;top:auto;bottom:7%;transform:none}.leader-photo-slot:after{background:linear-gradient(180deg,transparent 20%,rgba(8,18,11,.95))}}
-@media(prefers-reduced-motion:reduce){.phrase-headline span{animation:none;opacity:1;transform:none}.story-panorama,.story-portrait,.story-copy{transform:none!important}.story-copy{opacity:1!important}}
+.hero{min-height:100vh;background-position:center;background-attachment:fixed}.hero-inner{z-index:2}.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:25vh;background:linear-gradient(transparent,var(--bg));pointer-events:none}
+.story-morph{height:220vh;position:relative;background:var(--bg)}.story-sticky{height:100vh;position:sticky;top:0;overflow:hidden}.story-panorama{position:absolute;left:4vw;right:4vw;top:5vh;height:72vh;border-radius:28px;overflow:hidden;box-shadow:0 35px 70px -35px #07120a;transform-origin:50% 15%;will-change:transform}.story-panorama img{width:100%;height:100%;object-fit:cover;display:block}.story-panorama::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,12,7,.03),rgba(4,12,7,.48))}.story-portrait{position:absolute;z-index:3;left:50%;bottom:5vh;width:min(25vw,285px);aspect-ratio:1/1.18;border:5px solid var(--bg);border-radius:24px;overflow:hidden;box-shadow:0 28px 54px -20px rgba(0,0,0,.55);transform:translateX(-50%);will-change:left,bottom,transform}.story-portrait img{width:100%;height:100%;object-fit:cover;display:block}.story-copy{position:absolute;z-index:4;left:52%;right:7vw;top:50%;width:auto;opacity:0;transform:translateY(-44%);color:var(--ink)}.story-copy h2{font-size:clamp(2rem,4.2vw,4.2rem);line-height:1.04;max-width:12ch;margin-bottom:18px}.story-copy p{font-size:1rem;line-height:1.7;color:var(--muted);max-width:50ch}
+.dual-story{display:grid;grid-template-columns:1.12fr .88fr;gap:16px;margin:-12px -14px 22px}.dual-story figure{margin:0;border-radius:15px;overflow:hidden}.dual-story figure:first-child{height:270px}.dual-story figure:last-child{height:205px;align-self:end}.dual-story img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.1s}.dual-story figure:hover img{transform:scale(1.06)}
+.impact-gallery{display:grid;grid-template-columns:1.3fr .7fr;gap:16px;margin:0 0 30px}.impact-gallery .big{grid-row:span 2;height:420px}.impact-gallery .small{height:202px}.impact-gallery figure{margin:0;border-radius:18px;overflow:hidden}.impact-gallery img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.1s}.impact-gallery figure:hover img{transform:scale(1.055)}
+.reveal-photo{opacity:0;transform:translateY(30px) scale(.98);transition:opacity .8s,transform .9s cubic-bezier(.2,.8,.2,1)}.reveal-photo.visible{opacity:1;transform:none}
+.stat .num{font-variant-numeric:tabular-nums;letter-spacing:-.02em;min-height:1.15em}.stat .num.shuffling{color:var(--lime-deep);text-shadow:0 0 18px rgba(183,217,60,.28)}.stat .num.locked{animation:numberLock .48s cubic-bezier(.2,.9,.2,1)}@keyframes numberLock{0%{transform:translateY(-8px) scale(1.08);filter:blur(2px)}100%{transform:none;filter:none}}
+.leader-row,.leader-row.reverse{display:block;position:relative;min-height:540px;border-radius:24px;overflow:hidden;background:#0e1d12}.leader-photo-slot,.leader-row.reverse .leader-photo-slot{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;border-radius:0;opacity:0;transform:scale(1.07);transition:opacity .9s,transform 1.4s cubic-bezier(.2,.8,.2,1)}.leader-row.visible .leader-photo-slot{opacity:1;transform:scale(1)}.leader-photo-slot::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,18,11,.92),rgba(8,18,11,.55) 52%,rgba(8,18,11,.08))}.leader-text{position:absolute;z-index:2;left:7%;top:50%;transform:translateY(-50%);width:min(55%,590px);color:#fff}.leader-text blockquote{color:#fff;font-size:clamp(1.45rem,2.8vw,2.45rem);line-height:1.36;text-shadow:0 2px 16px rgba(0,0,0,.4)}.leader-title{color:rgba(255,255,255,.72)}
+.carousel-card{transition:transform .35s}.carousel-card:hover{transform:translateY(-8px)}.media-box.photo img{transition:transform 1s}.media-box.photo:hover img{transform:scale(1.07)}
+@media(max-width:760px){.hero{background-attachment:scroll}.story-panorama{left:3vw;right:3vw;top:4vh;height:55vh}.story-portrait{width:42vw;bottom:20vh}.story-copy{left:46%;right:4vw;top:55%;transform:translateY(-20%)}.story-copy h2{font-size:1.55rem}.story-copy p{font-size:.82rem}.dual-story,.impact-gallery{grid-template-columns:1fr}.dual-story figure:first-child,.dual-story figure:last-child,.impact-gallery .big,.impact-gallery .small{height:230px}.leader-row,.leader-row.reverse{min-height:500px}.leader-text{left:7%;right:7%;width:auto;top:auto;bottom:7%;transform:none}.leader-photo-slot::after{background:linear-gradient(180deg,transparent 18%,rgba(8,18,11,.95))}}
+@media(prefers-reduced-motion:reduce){.phrase-headline span{animation:none;opacity:1;transform:none}.story-panorama,.story-portrait,.story-copy{transform:none!important}.story-copy{opacity:1!important}.reveal-photo{opacity:1;transform:none}}
 
 </style>
 </head>
@@ -677,7 +676,7 @@
     </div>
   </section>
 
-  <section class="story-morph" id="storyMorph"><div class="story-sticky"><div class="story-panorama" id="storyPanorama"><img src="village_panorama.jpg" alt="Panoramic rural landscape"></div><div class="story-portrait" id="storyPortrait"><img src="ceo_photo.jpg" alt="Leadership portrait"></div><div class="story-copy" id="storyCopy"><span class="eyebrow">Purpose in motion</span><h2>Impact moves from intention to everyday life.</h2><p>Scroll to follow how leadership commitment connects with communities, classrooms, healthcare access and a greener future.</p></div></div></section>
+  <section class="story-morph" id="storyMorph" aria-label="Purpose in motion"><div class="story-sticky"><div class="story-panorama" id="storyPanorama"><img src="village_panorama.jpg" alt="Panoramic rural landscape"></div><div class="story-portrait" id="storyPortrait"><img src="ceo_photo.jpg" alt="Leadership portrait"></div><div class="story-copy" id="storyCopy"><span class="eyebrow">Purpose in motion</span><h2>Impact moves from intention to everyday life.</h2><p>Scroll to follow how leadership commitment connects with communities, classrooms, healthcare access and a greener future.</p></div></div></section>
   <div class="stage" id="stage">
     <svg class="pathsvg" id="pathsvg">
       <path class="track" id="trackPath" d=""></path>
@@ -701,7 +700,6 @@
       </div>
     </div>
 
-    <div class="path-icon-layer" id="pathIconLayer" aria-hidden="true"></div>
     <!-- STOP 1: Healthcare -->
     <section class="stop" data-stop="0">
       <div class="stop-art">
@@ -711,7 +709,7 @@
         </svg>
       </div>
       <div class="card">
-        <div class="dual-story reveal-photo"><figure><img src="healthcare_child.jpg" alt="Community eye screening for a child"></figure><figure><img src="healthcare_senior.jpg" alt="Community eye screening for a senior"></figure></div>
+        <div class="dual-story reveal-photo"><figure><img loading="lazy" src="healthcare_child.jpg" alt="Community eye screening for a child"></figure><figure><img loading="lazy" src="healthcare_senior.jpg" alt="Community eye screening for a senior"></figure></div>
         <h2>Healthcare</h2>
         <p>We are driving meaningful impact in the health care sector by supporting hospitals with essential medical equipment, conducting eye screening programs in rural communities, and partnering with institutions to strengthen access to quality health care.</p>
         <a class="sector-link" data-sector="healthcare" href="#" target="_blank" rel="noopener">View Healthcare projects in SharePoint <span class="arrow">→</span></a>
@@ -727,7 +725,7 @@
         </svg>
       </div>
       <div class="card">
-        <div class="dual-story reveal-photo"><figure><img src="education_students.jpg" alt="Students participating in a classroom"></figure><figure><img src="education_teacher.jpg" alt="Teacher leading a classroom lesson"></figure></div>
+        <div class="dual-story reveal-photo"><figure><img loading="lazy" src="education_students.jpg" alt="Students participating in a classroom"></figure><figure><img loading="lazy" src="education_teacher.jpg" alt="Teacher leading a classroom lesson"></figure></div>
         <h2>Education</h2>
         <p>We are actively driving a couple of education-related CSR projects across India, with a focus on improving access to quality learning opportunities and supporting long-term educational development in underserved communities.</p>
         <a class="sector-link" data-sector="education" href="#" target="_blank" rel="noopener">View Education projects in SharePoint <span class="arrow">→</span></a>
@@ -745,7 +743,7 @@
         </svg>
       </div>
       <div class="card">
-        <div class="dual-story reveal-photo"><figure><img src="community_planting.jpg" alt="Community tree planting"></figure><figure><img src="sapling_closeup.jpg" alt="Sapling held before planting"></figure></div>
+        <div class="dual-story reveal-photo"><figure><img loading="lazy" src="community_planting.jpg" alt="Community tree planting"></figure><figure><img loading="lazy" src="sapling_closeup.jpg" alt="Sapling held before planting"></figure></div>
         <h2>Sustainability</h2>
         <p>We are driving CSR initiatives for sustainability through tree plantation, afforestation, lake cleaning, and related environmental activities. These efforts restore ecosystems, improve biodiversity, and create long-term environmental value for communities.</p>
         <a class="sector-link" data-sector="sustainability" href="#" target="_blank" rel="noopener">View Sustainability projects in SharePoint <span class="arrow">→</span></a>
@@ -906,7 +904,7 @@
         </svg>
         <h2 style="margin-bottom:14px;">Our impact, so far</h2>
         <p class="stat-intro">Our CSR initiative, focused on creating meaningful social and environmental impact, has made significant progress. This snapshot highlights a successful effort that's delivering positive change for communities and reinforcing our commitment to responsible growth.</p>
-        <div class="impact-gallery reveal-photo"><figure class="big"><img src="community_meeting.jpg" alt="Community meeting outdoors"></figure><figure class="small"><img src="community_volunteers.jpg" alt="Community volunteers at a planting site"></figure><figure class="small"><img src="community_gift.jpg" alt="Educational materials being presented in a community"></figure></div><div class="stat-grid">
+        <div class="impact-gallery reveal-photo"><figure class="big"><img loading="lazy" src="community_meeting.jpg" alt="Community meeting outdoors"></figure><figure class="small"><img loading="lazy" src="community_volunteers.jpg" alt="Community volunteers at a planting site"></figure><figure class="small"><img loading="lazy" src="community_gift.jpg" alt="Educational materials presented in a community"></figure></div><div class="stat-grid">
           <div class="stat">
             <div class="stat-icon"><img src="sapling_closeup.jpg" alt="Hands holding a young sapling"></div>
             <div class="num" data-target="320" data-suffix="K+">0</div>
@@ -1214,13 +1212,38 @@
       </div>
     </section>
 
-    <!-- STOP 7: Success stories carousel -->
-<section class="stop wide" data-stop="6"><div class="card"><h2 style="margin-bottom:22px;">Stories of change</h2><div class="carousel" data-carousel><div class="carousel-scroller">
-<div class="carousel-card"><div class="media-box photo" data-photo="community_gift.jpg"><img src="community_gift.jpg" alt="Educational materials presented in a community"></div><div class="carousel-caption"><h3>Supporting learning journeys</h3><p>Resources placed in the hands of learners and communities.</p></div></div>
-<div class="carousel-card"><div class="media-box photo" data-photo="community_meeting.jpg"><img src="community_meeting.jpg" alt="Community gathering outdoors"></div><div class="carousel-caption"><h3>Listening before acting</h3><p>Local conversations help shape relevant action.</p></div></div>
-<div class="carousel-card"><div class="media-box photo" data-photo="community_planting.jpg"><img src="community_planting.jpg" alt="Community members planting a sapling"></div><div class="carousel-caption"><h3>Growing a greener future</h3><p>Planting work brings generations together around shared land.</p></div></div>
-<div class="carousel-card"><div class="media-box photo" data-photo="community_volunteers.jpg"><img src="community_volunteers.jpg" alt="Volunteer group at a planting site"></div><div class="carousel-caption"><h3>Volunteer power</h3><p>Collective participation turns plans into visible progress.</p></div></div>
-</div><div class="carousel-controls"><button class="carousel-arrow" data-prev aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><button class="carousel-arrow" data-next aria-label="Next"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button></div></div></div></section>
+    <!-- STOP 7: Success stories carousel (video-capable, 3 slots) -->
+    <section class="stop wide" data-stop="6">
+      <div class="card">
+        <h2 style="margin-bottom:22px;">Our success stories</h2>
+        <div class="carousel" data-carousel>
+          <div class="carousel-scroller">
+            <div class="carousel-card">
+              <div class="media-box photo" data-photo="community_planting.jpg">
+                <img src="community_planting.jpg" alt="Rooftop solar installation at Sai Ranga Vidya Samsthe">
+              </div>
+              <div class="carousel-caption"><h3>Powering the campus with solar</h3><p>Sai Ranga Vidya Samsthe, Mysuru — a 5 kW rooftop solar system now supports the residential campus for hearing-impaired children.</p></div>
+            </div>
+            <div class="carousel-card">
+              <div class="media-box photo" data-photo="education_teacher.jpg">
+                <img src="education_teacher.jpg" alt="Computer lab at Sai Ranga Vidya Samsthe">
+              </div>
+              <div class="carousel-caption"><h3>A computer lab for every student</h3><p>Sai Ranga Vidya Samsthe, Mysuru — equipped workstations give students hands-on digital learning access.</p></div>
+            </div>
+            <div class="carousel-card">
+              <div class="media-box photo" data-photo="education_students.jpg">
+                <img src="education_students.jpg" alt="Classroom session at Sai Ranga Vidya Samsthe">
+              </div>
+              <div class="carousel-caption"><h3>Learning, every single day</h3><p>Sai Ranga Vidya Samsthe, Mysuru — inside a typical classroom session on campus.</p></div>
+            </div>
+          </div>
+          <div class="carousel-controls">
+            <button class="carousel-arrow" data-prev aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <button class="carousel-arrow" data-next aria-label="Next"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
   <div class="lightbox" id="lightbox">
@@ -1247,19 +1270,11 @@
   var marker = document.getElementById('marker');
   var petals = document.getElementById('petals');
   var stops = Array.prototype.slice.call(document.querySelectorAll('.stop'));
-  var pathIconLayer=document.getElementById('pathIconLayer'), pathIcons=[];
   var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
 
   var pathLength = 0;
 
-  var ICONS=[
-'<svg viewBox="0 0 32 32"><path d="M8 20h15a5 5 0 0 0 0-10 8 8 0 0 0-15-1 5.5 5.5 0 0 0 0 11z"/><path d="M11 24l-1 3M17 24l-1 3M23 24l-1 3"/></svg>',
-'<svg viewBox="0 0 32 32"><path d="M5 19h22l-4 7H9l-4-7z"/><path d="M16 6v13M16 7l8 8h-8"/></svg>',
-'<svg viewBox="0 0 32 32"><path d="M5 15l11-8 11 8v12H5V15z"/><path d="M11 27v-8h10v8"/></svg>',
-'<svg viewBox="0 0 32 32"><rect x="7" y="9" width="18" height="16" rx="3"/><path d="M16 9V5M13 5h6M11 15h.1M21 15h.1M11 21h10"/></svg>'];
-  function ensurePathIcons(){if(!pathIconLayer||pathIcons.length)return;stops.forEach(function(_,i){var e=document.createElement('div');e.className='path-icon';e.innerHTML=ICONS[i%ICONS.length];pathIconLayer.appendChild(e);pathIcons.push(e);});}
   function buildPath(){
-    ensurePathIcons();
     var w = stage.clientWidth;
     var h = stage.scrollHeight;
     svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
@@ -1277,7 +1292,6 @@
       return {x: x, y: y};
     });
 
-    pathIcons.forEach(function(icon,i){var q=waypoints[i];if(q){icon.style.left=q.x+'px';icon.style.top=q.y+'px';}});
     var start = {x: cx, y: 0};
     var end = {x: cx, y: h};
     var pts = [start].concat(waypoints).concat([end]);
@@ -1319,7 +1333,6 @@
 
     var pt = drawPath.getPointAtLength(pathLength * progress);
     marker.style.transform = 'translate(' + pt.x + 'px,' + pt.y + 'px)';
-    pathIcons.forEach(function(icon,i){icon.classList.toggle('visible',progress>=((i+.4)/Math.max(1,stops.length)));});
 
     var dy = window.scrollY - lastY;
     lastY = window.scrollY;
@@ -1353,10 +1366,10 @@
   requestAnimationFrame(raf);
 
 
-  // Premium scroll morph and image reveals
+  // Corrected panoramic morph: image contracts left, portrait settles left, copy stays in viewport.
   var storyMorph=document.getElementById('storyMorph'),storyPanorama=document.getElementById('storyPanorama'),storyPortrait=document.getElementById('storyPortrait'),storyCopy=document.getElementById('storyCopy');
-  function updateStory(){if(!storyMorph)return;var r=storyMorph.getBoundingClientRect(),m=Math.max(1,storyMorph.offsetHeight-innerHeight),p=Math.max(0,Math.min(1,-r.top/m)),e=p*p*(3-2*p);storyPanorama.style.transform='translateY('+(-12*e)+'vh) scale('+(1-.26*e)+')';storyPortrait.style.left=(50-36*e)+'%';storyPortrait.style.bottom=(3+20*e)+'vh';storyPortrait.style.transform='translateX(-50%) scale('+(1-.12*e)+')';storyCopy.style.opacity=Math.max(0,Math.min(1,(e-.25)/.43));storyCopy.style.transform='translateY('+(35*(1-e))+'px)';}
-  addEventListener('scroll',updateStory,{passive:true});addEventListener('resize',updateStory);updateStory();
+  function updateStory(){if(!storyMorph)return;var r=storyMorph.getBoundingClientRect(),m=Math.max(1,storyMorph.offsetHeight-window.innerHeight),p=Math.max(0,Math.min(1,-r.top/m)),e=p*p*(3-2*p);storyPanorama.style.transform='translate(-10vw,'+(-9*e)+'vh) scale('+(1-.35*e)+')';storyPortrait.style.left=(50-34*e)+'%';storyPortrait.style.bottom=(5+19*e)+'vh';storyPortrait.style.transform='translateX(-50%) scale('+(1-.12*e)+')';storyCopy.style.opacity=Math.max(0,Math.min(1,(e-.28)/.38));storyCopy.style.transform='translateY('+(-44+8*(1-e))+'%)';}
+  window.addEventListener('scroll',updateStory,{passive:true});window.addEventListener('resize',updateStory);updateStory();
   var photoObserver=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');photoObserver.unobserve(e.target);}})},{threshold:.18});document.querySelectorAll('.reveal-photo').forEach(function(e){photoObserver.observe(e);});
 
   // ---------- Project map (floating popup follows the pin) ----------
@@ -1470,20 +1483,27 @@
     return rest + ',' + last3;
   }
   function animateCount(el){
-    var target = parseFloat(el.getAttribute('data-target'));
-    var suffix = el.getAttribute('data-suffix') || '';
-    var useCommas = target >= 1000 && suffix.indexOf('K') === -1;
-    var duration = 1400;
-    var start = null;
-    function step(ts){
-      if (!start) start = ts;
-      var progress = Math.min((ts - start) / duration, 1);
-      var eased = 1 - Math.pow(1 - progress, 3);
-      var value = target * eased;
-      el.textContent = (useCommas ? formatIndian(value) : Math.round(value)) + suffix;
-      if (progress < 1) requestAnimationFrame(step);
+    var target=parseFloat(el.getAttribute('data-target'));
+    var suffix=el.getAttribute('data-suffix')||'';
+    var useCommas=target>=1000 && suffix.indexOf('K')===-1;
+    var prefersReduced=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function display(v){el.textContent=(useCommas?formatIndian(v):Math.round(v))+suffix;}
+    if(prefersReduced){display(target);return;}
+    el.classList.add('shuffling');
+    var steps=18,current=0;
+    function shuffle(){
+      current++;
+      var spread=Math.max(12,target*(.95-current/steps*.72));
+      var random=Math.max(0,Math.round(target+(Math.random()-.5)*spread));
+      display(random);
+      if(current<steps){setTimeout(shuffle,38+current*7);}
+      else{
+        var startValue=Math.max(0,target-Math.max(10,target*.12)),startTime=null,duration=620;
+        function settle(ts){if(!startTime)startTime=ts;var p=Math.min(1,(ts-startTime)/duration),ease=1-Math.pow(1-p,3);display(startValue+(target-startValue)*ease);if(p<1)requestAnimationFrame(settle);else{display(target);el.classList.remove('shuffling');el.classList.add('locked');}}
+        requestAnimationFrame(settle);
+      }
     }
-    requestAnimationFrame(step);
+    shuffle();
   }
   var numsObserved = new WeakSet();
   var numsObserver = new IntersectionObserver(function(entries){
