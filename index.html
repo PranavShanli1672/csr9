@@ -49,9 +49,10 @@
     padding:8vh 8vw;
     color:#fff;
     background:
-      radial-gradient(120% 90% at 15% 20%, rgba(183,217,60,0.14), transparent 55%),
-      radial-gradient(90% 70% at 80% 75%, rgba(0,0,0,0.35), transparent 60%),
-      linear-gradient(160deg, #16281A 0%, #0E1D12 55%, #0A150D 100%);
+      radial-gradient(120% 90% at 15% 20%, rgba(183,217,60,0.16), transparent 55%),
+      radial-gradient(90% 80% at 50% 50%, rgba(10,21,13,0.55), rgba(10,21,13,0.82)),
+      linear-gradient(160deg, rgba(22,40,26,0.75) 0%, rgba(14,29,18,0.85) 55%, rgba(10,21,13,0.92) 100%),
+      url('village_panorama.jpg') center 40%/cover no-repeat;
     overflow:hidden;
   }
   .hero::before{
@@ -154,6 +155,14 @@
     transition:opacity 0.7s cubic-bezier(.2,.8,.2,1), transform 0.7s cubic-bezier(.2,.8,.2,1);
   }
   .card.visible{ opacity:1; transform:translateY(0); }
+  .pillar-image{
+    display:block;
+    width:calc(100% + 68px);
+    margin:-32px -34px 20px;
+    aspect-ratio:16/10;
+    object-fit:cover;
+    border-radius:16px 16px 0 0;
+  }
   .card h2{ font-size:1.7rem; margin-bottom:10px; }
   .card p{ margin:0 0 14px; color:var(--muted); font-size:0.98rem; line-height:1.6; }
   .card .learn{
@@ -162,6 +171,22 @@
     letter-spacing:0.06em; color:var(--path);
     background:none; border:none; padding:0; cursor:pointer;
   }
+  .sector-link{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.04em;
+    color:var(--panel); background:var(--forest);
+    padding:10px 18px; border-radius:24px;
+    text-decoration:none;
+    transition:background 0.2s ease, transform 0.2s ease;
+  }
+  .sector-link:hover{ background:var(--path); transform:translateY(-1px); }
+  .sector-link .arrow{ transition:transform 0.2s ease; }
+  .sector-link:hover .arrow{ transform:translateX(3px); }
+  .sector-link.pending{
+    background:none; color:var(--muted); border:1px dashed var(--path-track);
+    cursor:default; pointer-events:none;
+  }
+  .sector-link.pending:hover{ transform:none; }
   .stop:nth-child(even) .card .learn{ flex-direction:row-reverse; }
 
   .project-list{
@@ -233,6 +258,13 @@
   .dive-field:first-of-type{ border-top:none; padding-top:0; }
   .dive-label{ font-weight:600; font-size:0.8rem; color:var(--ink); margin-bottom:3px; }
   .dive-value{ font-size:0.8rem; color:var(--muted); line-height:1.5; }
+  .dive-internal-link{
+    display:inline-flex; align-items:center; gap:5px;
+    margin-top:14px; padding-top:12px; border-top:1px solid #EEEBDF;
+    font-family:'IBM Plex Mono',monospace; font-size:11px;
+    color:var(--path); text-decoration:none;
+  }
+  .dive-internal-link .lock{ font-size:10px; }
 
   .panel-filter{ display:flex; gap:6px; margin-bottom:14px; }
   .panel-chip{
@@ -268,15 +300,14 @@
 
   /* ---------- PROJECT MAP ---------- */
   .map-wrap{
-    display:grid;
-    grid-template-columns:1.15fr 1fr;
-    gap:30px;
-    align-items:start;
+    width:100%;
+    max-width:640px;
+    margin:0 auto;
   }
   .map-svg-box{ position:relative; }
   .india-outline{
     fill:#EEF1E6; stroke:#C9D2BC; stroke-width:1.4;
-    filter:drop-shadow(0 10px 22px rgba(31,59,36,0.12));
+    filter:drop-shadow(0 10px 22px rgba(14,29,18,0.12));
   }
   .map-pin{ cursor:pointer; }
   .map-pin circle.dot{ fill:var(--path); stroke:#fff; stroke-width:2.5; transition:fill 0.2s ease, r 0.2s ease; }
@@ -295,27 +326,35 @@
   }
   .map-pin:hover circle.dot{ r:12; }
 
-  .location-list{ display:flex; flex-direction:column; gap:4px; margin-bottom:18px; }
-  .location-row{
-    display:flex; align-items:center; justify-content:space-between;
-    width:100%; text-align:left;
-    padding:10px 12px; border-radius:10px;
-    border:1px solid transparent; background:none; cursor:pointer;
-    font-family:'Inter',sans-serif; font-size:0.92rem; color:var(--ink);
+  /* Floating popup (was a side panel — now follows the pin) */
+  .location-detail{
+    position:absolute; top:0; left:0;
+    width:270px; max-width:78vw;
+    background:var(--panel);
+    border-radius:16px;
+    box-shadow:0 26px 50px -18px rgba(14,29,18,0.35);
+    padding:18px 20px;
+    z-index:30;
+    opacity:0; visibility:hidden; pointer-events:none;
+    transform:translateY(8px) scale(0.98);
+    transition:opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
   }
-  .location-row .count{
-    font-family:'IBM Plex Mono',monospace; font-size:11px;
-    color:var(--muted); background:#EFEEE4; border-radius:20px; padding:2px 8px;
+  .location-detail.active{
+    opacity:1; visibility:visible; pointer-events:auto;
+    transform:translateY(0) scale(1);
   }
-  .location-row:hover{ background:#F6F5EF; }
-  .location-row.active{ background:#F1F3EC; border-color:#DCE2D6; }
-  .location-row.active .count{ background:var(--lime); color:var(--forest-deep); }
-
-  .location-detail{ display:none; }
-  .location-detail.active{ display:block; }
+  .location-detail .popup-state{
+    font-family:'Fraunces',serif; font-weight:600; font-size:1.08rem;
+    margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid #EEEBDF;
+    display:flex; align-items:center; gap:8px;
+  }
+  .location-detail .popup-state .pin-dot{
+    width:9px; height:9px; border-radius:50%; background:var(--lime-deep); flex-shrink:0;
+  }
   .location-detail .year-group{ border-top:1px solid #EEEBDF; }
   .location-detail .year-group:first-child{ border-top:none; margin-top:0; padding-top:0; }
   .location-detail .empty-note{ color:var(--muted); font-size:0.88rem; font-style:italic; }
+  .location-detail .year-group ul{ max-height:180px; overflow-y:auto; }
 
   .year-filter{ display:flex; gap:8px; margin-bottom:20px; }
   .year-chip{
@@ -344,7 +383,14 @@
   .donut{ position:relative; width:130px; height:130px; margin:0 auto 14px; }
   .donut svg{ width:100%; height:100%; }
   .donut-track{ fill:none; stroke:#EEEBDF; stroke-width:11; }
-  .donut-seg{ fill:none; stroke-width:11; stroke-linecap:butt; transition:stroke-dasharray 0.6s ease; }
+  .donut-seg{ fill:none; stroke-width:11; stroke-linecap:round; transition:stroke-dasharray 1.1s cubic-bezier(.2,.8,.2,1); }
+  .chart-icon{
+    width:36px; height:36px; border-radius:50%;
+    background:rgba(183,217,60,0.22);
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 10px;
+  }
+  .chart-icon svg{ width:20px; height:20px; stroke:var(--forest); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
   .donut-total{
     position:absolute; inset:0; display:flex; flex-direction:column;
     align-items:center; justify-content:center;
@@ -370,9 +416,30 @@
   }
 
   /* ---------- NUMBERS ---------- */
-  .stat-intro{ color:var(--muted); font-size:0.96rem; line-height:1.6; margin-bottom:26px; max-width:66ch; }
-  .stat-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:22px 28px; }
-  .stat{ border-top:1px solid #E7E4D9; padding-top:14px; }
+  .stat-intro{ color:var(--muted); font-size:0.96rem; line-height:1.6; margin-bottom:30px; max-width:66ch; }
+  .stat-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:26px 24px; }
+  .stat{
+    background:#FBFAF6;
+    border:1px solid #EEEBDF;
+    border-radius:16px;
+    padding:20px 18px;
+    opacity:0; transform:translateY(16px) scale(0.97);
+    transition:opacity 0.5s ease, transform 0.5s ease, box-shadow 0.25s ease;
+    transition-delay:calc(var(--i, 0) * 90ms);
+  }
+  .card.visible .stat{ opacity:1; transform:translateY(0) scale(1); }
+  .stat:hover{ box-shadow:0 14px 28px -16px rgba(14,29,18,0.25); transform:translateY(-3px); }
+  .stat-icon{
+    width:64px; height:64px; border-radius:50%;
+    background:rgba(183,217,60,0.22);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:14px;
+    overflow:hidden;
+    border:2px solid #FFFFFF;
+    box-shadow:0 4px 12px -4px rgba(14,29,18,0.3);
+  }
+  .stat-icon img{ width:100%; height:100%; object-fit:cover; }
+  .stat-icon svg{ width:24px; height:24px; stroke:var(--forest); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
   .stat .num{ font-family:'Fraunces',serif; font-size:1.9rem; color:var(--forest); }
   .stat .tag{ color:var(--lime-deep); font-weight:600; font-size:0.85rem; margin-top:4px; }
   .stat .sub{ color:var(--muted); font-size:0.82rem; margin-top:2px; }
@@ -402,7 +469,7 @@
     overflow:hidden;
     background:
       radial-gradient(60% 80% at 30% 20%, rgba(183,217,60,0.18), transparent 60%),
-      linear-gradient(135deg, #1B301F, #0E1D12);
+      linear-gradient(135deg, #16281A, #0E1D12);
     display:flex; align-items:center; justify-content:center;
   }
   .play-btn{
@@ -432,7 +499,7 @@
   }
   .carousel-arrow{
     width:38px; height:38px; border-radius:50%;
-    border:1px solid #DDE3D5; background:var(--panel);
+    border:1px solid #DCE2D6; background:var(--panel);
     display:flex; align-items:center; justify-content:center;
     cursor:pointer;
   }
@@ -475,7 +542,7 @@
     font-family:'Fraunces',serif; font-size:1.2rem; color:#fff;
     transition:transform 0.25s ease, box-shadow 0.25s ease;
   }
-  .member:hover .avatar{ transform:translateY(-4px) scale(1.06); box-shadow:0 14px 24px -10px rgba(31,59,36,0.45); }
+  .member:hover .avatar{ transform:translateY(-4px) scale(1.06); box-shadow:0 14px 24px -10px rgba(14,29,18,0.45); }
   .member h3{ font-size:0.98rem; margin-bottom:2px; }
   .member .role{ color:var(--muted); font-size:0.82rem; }
 
@@ -492,7 +559,61 @@
   body.embedded .hero{ min-height:56vh; padding:6vh 7vw; }
   body.embedded .hero h1{ font-size:clamp(1.8rem, 4.4vw, 2.6rem); }
 
-  /* ---------- LIGHTBOX (fullscreen video/media) ---------- */
+  /* ---------- LEADERSHIP SPOTLIGHT ---------- */
+  .leader-stack{ display:flex; flex-direction:column; gap:64px; }
+  .leader-row{
+    display:flex; align-items:center; gap:44px;
+  }
+  .leader-row.reverse{ flex-direction:row-reverse; }
+
+  .leader-photo-slot{
+    flex:0 0 200px;
+    aspect-ratio:3/4;
+    border-radius:18px;
+    background:linear-gradient(155deg, #EEF1E6 0%, #DCE2D6 100%);
+    overflow:hidden;
+    position:relative;
+    opacity:0; transform:translateX(-46px);
+    transition:opacity 0.9s cubic-bezier(.2,.8,.2,1), transform 0.9s cubic-bezier(.2,.8,.2,1);
+  }
+  .leader-row.reverse .leader-photo-slot{ transform:translateX(46px); }
+  .leader-row.visible .leader-photo-slot{ opacity:1; transform:translateX(0); }
+  .leader-photo-slot img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .leader-photo-slot .placeholder-mark{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  }
+  .leader-photo-slot .placeholder-mark svg{ width:44px; height:44px; stroke:var(--forest); fill:none; stroke-width:1.4; opacity:0.4; }
+
+  .leader-text{ flex:1; min-width:0; }
+  .leader-text .line{
+    opacity:0; transform:translateY(16px);
+    transition:opacity 0.7s ease, transform 0.7s ease;
+  }
+  .leader-row.visible .leader-text .line{ opacity:1; transform:translateY(0); }
+  .leader-text .line:nth-child(1){ transition-delay:0.05s; }
+  .leader-text .line:nth-child(2){ transition-delay:0.22s; }
+  .leader-text .line:nth-child(3){ transition-delay:0.39s; }
+  .leader-text .line:nth-child(4){ transition-delay:0.56s; }
+  .leader-text .signature{ transition-delay:0.72s; }
+
+  .leader-text blockquote{
+    font-family:'Fraunces',serif; font-style:italic; font-weight:500;
+    font-size:1.4rem; line-height:1.6; color:var(--ink);
+    margin:0 0 22px; padding:0;
+  }
+  .leader-text .line{ display:block; }
+  .leader-text blockquote .line:first-of-type::before{ content:"\201C"; color:var(--lime-deep); }
+  .leader-text blockquote .line:last-of-type::after{ content:"\201D"; color:var(--lime-deep); }
+  .leader-name{ font-weight:700; font-size:0.98rem; }
+  .leader-title{ color:var(--muted); font-size:0.85rem; margin-top:2px; }
+
+  @media (max-width:720px){
+    .leader-row, .leader-row.reverse{ flex-direction:column; align-items:flex-start; gap:24px; }
+    .leader-photo-slot{ flex:0 0 auto; width:150px; }
+    .leader-text blockquote{ font-size:1.2rem; }
+  }
+
+
   .lightbox{
     position:fixed; inset:0; z-index:999;
     background:rgba(9,16,11,0.94);
@@ -522,6 +643,21 @@
     .card{ transition:none; opacity:1; transform:none; }
     .scroll-cue .stem{ animation:none; }
   }
+
+/* ===== PREMIUM STORY EXPERIENCE ===== */
+.phrase-headline span{display:block;opacity:0;transform:translateY(28px);animation:phraseIn .85s cubic-bezier(.2,.8,.2,1) forwards}.phrase-headline span:nth-child(1){animation-delay:.15s}.phrase-headline span:nth-child(2){animation-delay:.48s}.phrase-headline span:nth-child(3){animation-delay:.81s}.phrase-headline .bold{font-weight:700}@keyframes phraseIn{to{opacity:1;transform:none}}
+.hero{min-height:100vh;background-position:center;background-attachment:fixed}.hero::after{content:"";position:absolute;inset:auto 0 0;height:26vh;background:linear-gradient(transparent,var(--bg));pointer-events:none}.hero-inner{z-index:2}
+.story-morph{height:220vh;position:relative}.story-sticky{height:100vh;position:sticky;top:0;overflow:hidden}.story-panorama{position:absolute;inset:6vh 4vw 9vh;border-radius:28px;overflow:hidden;box-shadow:0 35px 70px -35px #07120a;transform-origin:50% 15%;will-change:transform}.story-panorama img{width:100%;height:100%;object-fit:cover;display:block}.story-panorama:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,12,7,.02),rgba(4,12,7,.58))}.story-portrait{position:absolute;z-index:3;left:50%;bottom:3vh;width:min(27vw,310px);aspect-ratio:1/1.15;border:6px solid var(--bg);border-radius:24px;overflow:hidden;box-shadow:0 28px 54px -20px rgba(0,0,0,.55);transform:translateX(-50%);will-change:left,bottom,transform}.story-portrait img{width:100%;height:100%;object-fit:cover}.story-copy{position:absolute;z-index:4;left:45%;right:7vw;top:46%;opacity:0;transform:translateY(35px)}.story-copy h2{font-size:clamp(2.2rem,5vw,4.8rem);line-height:1.02}.story-copy p{font-size:1.05rem;line-height:1.7;color:var(--muted);max-width:56ch}
+.path-icon-layer{position:absolute;inset:0;pointer-events:none;z-index:2}.path-icon{position:absolute;width:58px;height:58px;margin:-29px;border:2px solid var(--path);border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 15px 28px -16px rgba(14,29,18,.5);opacity:0;transform:scale(.5) rotate(-18deg);transition:.55s cubic-bezier(.2,.9,.2,1)}.path-icon.visible{opacity:1;transform:scale(1) rotate(0)}.path-icon svg{width:29px;height:29px;fill:none;stroke:var(--forest);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pillar-image{transition:transform 1.2s cubic-bezier(.2,.8,.2,1),filter .8s}.card:hover .pillar-image{transform:scale(1.035);filter:saturate(1.08)}.card{overflow:hidden}.stop:not(.wide):nth-of-type(odd) .card{margin-left:0;margin-right:auto}.stop:not(.wide):nth-of-type(even) .card{margin-left:auto;margin-right:0}
+.dual-story{display:grid;grid-template-columns:1.12fr .88fr;gap:18px;margin:18px 0 22px}.dual-story figure{margin:0;border-radius:16px;overflow:hidden;position:relative}.dual-story figure:first-child{height:290px}.dual-story figure:last-child{height:220px;align-self:end}.dual-story img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.2s}.dual-story figure:hover img{transform:scale(1.06)}
+.leader-row,.leader-row.reverse{display:block;position:relative;min-height:560px;border-radius:24px;overflow:hidden;background:#0e1d12}.leader-photo-slot,.leader-row.reverse .leader-photo-slot{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;border-radius:0;opacity:0;transform:scale(1.08);transition:opacity .9s,transform 1.5s cubic-bezier(.2,.8,.2,1)}.leader-row.visible .leader-photo-slot{opacity:1;transform:scale(1)}.leader-photo-slot:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,18,11,.92),rgba(8,18,11,.55) 50%,rgba(8,18,11,.05))}.leader-text{position:absolute;z-index:2;left:7%;top:50%;transform:translateY(-50%);width:min(55%,590px);color:#fff}.leader-text blockquote{color:#fff;font-size:clamp(1.5rem,3vw,2.55rem);line-height:1.35;text-shadow:0 2px 16px rgba(0,0,0,.4)}.leader-title{color:rgba(255,255,255,.72)}
+.impact-gallery{display:grid;grid-template-columns:1.3fr .7fr;gap:16px;margin:0 0 30px}.impact-gallery .big{grid-row:span 2;height:430px}.impact-gallery .small{height:207px}.impact-gallery figure{margin:0;border-radius:18px;overflow:hidden;position:relative}.impact-gallery img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.2s}.impact-gallery figure:hover img{transform:scale(1.055)}
+.carousel-card{transition:transform .35s,opacity .35s}.carousel-card:hover{transform:translateY(-8px) rotate(.3deg)}.media-box.photo img{transition:transform 1s}.media-box.photo:hover img{transform:scale(1.07)}
+.reveal-photo{opacity:0;transform:translateY(34px) scale(.97);transition:opacity .8s,transform .9s cubic-bezier(.2,.8,.2,1)}.reveal-photo.visible{opacity:1;transform:none}
+@media(max-width:760px){.hero{background-attachment:scroll}.story-panorama{inset:4vh 3vw 19vh}.story-portrait{width:43vw}.story-copy{left:43%;right:4vw;top:50%}.story-copy h2{font-size:1.75rem}.story-copy p{font-size:.86rem}.dual-story,.impact-gallery{grid-template-columns:1fr}.dual-story figure:first-child,.dual-story figure:last-child,.impact-gallery .big,.impact-gallery .small{height:240px}.leader-row,.leader-row.reverse{min-height:500px}.leader-text{left:7%;right:7%;width:auto;top:auto;bottom:7%;transform:none}.leader-photo-slot:after{background:linear-gradient(180deg,transparent 20%,rgba(8,18,11,.95))}}
+@media(prefers-reduced-motion:reduce){.phrase-headline span{animation:none;opacity:1;transform:none}.story-panorama,.story-portrait,.story-copy{transform:none!important}.story-copy{opacity:1!important}}
+
 </style>
 </head>
 <body>
@@ -535,12 +671,13 @@
     </svg>
     <div class="hero-inner">
       <span class="eyebrow" style="color:var(--lime);">#teamZEISS · CSR</span>
-      <h1>Together, we create<span class="accent">better tomorrow</span></h1>
+      <h1 class="phrase-headline" aria-label="Our contribution to a world without waste"><span>Our contribution</span><span class="bold">to a world</span><span class="accent">without waste</span></h1>
       <p>Educating minds, improving lives, sustaining tomorrow — our work across healthcare, education and sustainability.</p>
       <div class="scroll-cue"><span class="stem"></span></div>
     </div>
   </section>
 
+  <section class="story-morph" id="storyMorph"><div class="story-sticky"><div class="story-panorama" id="storyPanorama"><img src="village_panorama.jpg" alt="Panoramic rural landscape"></div><div class="story-portrait" id="storyPortrait"><img src="ceo_photo.jpg" alt="Leadership portrait"></div><div class="story-copy" id="storyCopy"><span class="eyebrow">Purpose in motion</span><h2>Impact moves from intention to everyday life.</h2><p>Scroll to follow how leadership commitment connects with communities, classrooms, healthcare access and a greener future.</p></div></div></section>
   <div class="stage" id="stage">
     <svg class="pathsvg" id="pathsvg">
       <path class="track" id="trackPath" d=""></path>
@@ -564,6 +701,7 @@
       </div>
     </div>
 
+    <div class="path-icon-layer" id="pathIconLayer" aria-hidden="true"></div>
     <!-- STOP 1: Healthcare -->
     <section class="stop" data-stop="0">
       <div class="stop-art">
@@ -573,92 +711,10 @@
         </svg>
       </div>
       <div class="card">
+        <div class="dual-story reveal-photo"><figure><img src="healthcare_child.jpg" alt="Community eye screening for a child"></figure><figure><img src="healthcare_senior.jpg" alt="Community eye screening for a senior"></figure></div>
         <h2>Healthcare</h2>
         <p>We are driving meaningful impact in the health care sector by supporting hospitals with essential medical equipment, conducting eye screening programs in rural communities, and partnering with institutions to strengthen access to quality health care.</p>
-        <button class="learn" type="button" data-toggle="projects-healthcare">Learn more →</button>
-        <div class="project-list" id="projects-healthcare">
-          <div class="panel-filter"><button class="panel-chip active" data-year="all" type="button">All years</button><button class="panel-chip" data-year="2024-25" type="button">FY 2024–25</button><button class="panel-chip" data-year="2025-26" type="button">FY 2025–26</button></div>
-          <div class="year-group" data-year="2024-25">
-            <div class="year">FY 2024–25</div>
-            <ul>
-              <li class="proj">
-                <div class="proj-name">Upgrade of Neo-Natal and Pediatrics care facility — Sri Sathya Sai Sarla Memorial Hospital — Karnataka <span class="status-tag completed">Completed</span></div>
-                <div class="proj-details">
-                  <div class="dive-eyebrow">Project deep dive</div>
-                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">Completed</div></div>
-                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">Upgradation of the Neo-Natal and Pediatrics care facility at Sri Sathya Sai Sarla Memorial Hospital through the provision of advanced diagnostic and life-support medical equipment to improve newborn and child healthcare outcomes.</div></div>
-                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Strengthened neo-natal and pediatric care through advanced medical equipment; improved early diagnosis, treatment, and survival outcomes for newborns and children.</div></div>
-                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 3 – Good health and well-being</div></div>
-                </div>
-              </li>
-              <li class="proj">
-                <div class="proj-name">Promoting the use of AI for eyecare and upskilling of students — Bangalore, Karnataka <span class="status-tag inprogress">In progress</span></div>
-                <div class="proj-details">
-                  <div class="dive-eyebrow">Project deep dive</div>
-                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">In progress</div></div>
-                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">CSR support to the Indian Institute of Science (IISc) for promoting the use of Artificial Intelligence in eye care and upskilling postgraduate students through AI-driven research, fellowships, and advanced technology applications.</div></div>
-                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Strengthened AI-enabled eye care research, improved early diagnosis and precision in ocular health, and built a skilled talent pool trained in AI applications for healthcare.</div></div>
-                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 3 – Good health and well-being (+1 more)</div></div>
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div class="year-group" data-year="2025-26">
-            <div class="year">FY 2025–26</div>
-            <ul>
-              <li class="proj">
-                <div class="proj-name">Upgrading and Expanding 5 Vision Centers with Comprehensive Eye Care and Teleconsultation Facilities — Madhya Pradesh <span class="status-tag completed">Completed</span></div>
-                <div class="proj-details">
-                  <div class="dive-eyebrow">Project deep dive</div>
-                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">Completed</div></div>
-                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">CSR support for the upgradation of five rural Vision Centers in Madhya Pradesh and Uttar Pradesh with advanced diagnostic equipment and teleconsultation facilities to strengthen last-mile eye care delivery.</div></div>
-                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Improved early detection and access to quality eye care in underserved communities, reduced referral and travel burden for rural patients.</div></div>
-                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 3 – Good health and well-being</div></div>
-                </div>
-              </li>
-              <li class="proj">
-                <div class="proj-name">Asha Kirana — Aloka Vision Programme, Kalaburagi — Kalaburagi, Karnataka <span class="status-tag completed">Completed</span></div>
-                <div class="proj-details">
-                  <div class="dive-eyebrow">Project deep dive</div>
-                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">Completed</div></div>
-                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">Delivering eye screenings and treatment to over 530,000 school children and around 600,000 underserved adults in Kalaburagi, while promoting awareness, corrective care, and capacity building of ophthalmic officers.</div></div>
-                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Eye screening for 531,946 children and ~600,000 adults; early detection, corrective care, and surgical referrals; improved vision and awareness.</div></div>
-                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 3 – Good health and well-being</div></div>
-                </div>
-              </li>
-              <li class="proj">
-                <div class="proj-name">Development of Neurosurgical Simulators with AI-Based Skill Assessment — Delhi <span class="status-tag inprogress">In progress</span></div>
-                <div class="proj-details">
-                  <div class="dive-eyebrow">Project deep dive</div>
-                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">In progress</div></div>
-                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">CSR support to AIIMS, New Delhi, for the design and development of an AI-enabled brain aneurysm clipping simulator using ZEISS surgical data to strengthen neurosurgical training through simulation-based learning.</div></div>
-                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Improved neurosurgical skill development through safe, high-fidelity simulation, reduced surgical risk, and enhanced training outcomes for residents.</div></div>
-                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 3 – Good health and well-being (+1 more)</div></div>
-                </div>
-              </li>
-              <li class="proj">
-                <div class="proj-name">AI innovations in Vision Care — Chennai, Tamil Nadu <span class="status-tag inprogress">In progress</span></div>
-                <div class="proj-details">
-                  <div class="dive-eyebrow">Project deep dive</div>
-                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">In progress</div></div>
-                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">CSR support to Sankara Nethralaya for developing and deploying AI-based ophthalmic tools to enable early diagnosis, risk prediction, and improved clinical workflows for eye diseases such as glaucoma and retinal disorders.</div></div>
-                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Improved early detection and clinical decision-making in ophthalmology, strengthened AI-driven eye care research, and enhanced patient outcomes.</div></div>
-                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 3 – Good health and well-being (+1 more)</div></div>
-                </div>
-              </li>
-              <li class="proj">
-                <div class="proj-name">Eyecare — Aloka Vision Programme — Gujarat <span class="status-tag inprogress">In progress</span></div>
-                <div class="proj-details">
-                  <div class="dive-eyebrow">Project deep dive</div>
-                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">In progress</div></div>
-                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">The project aims to provide accessible eye care, affordable spectacles, and create awareness about preventable blindness and refractive error screening.</div></div>
-                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Improved access to affordable vision screening and spectacles for underserved communities; enabled early detection and timely spectacle delivery through mobile eye camps.</div></div>
-                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 3 – Good health and well-being</div></div>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
+        <a class="sector-link" data-sector="healthcare" href="#" target="_blank" rel="noopener">View Healthcare projects in SharePoint <span class="arrow">→</span></a>
       </div>
     </section>
 
@@ -671,72 +727,10 @@
         </svg>
       </div>
       <div class="card">
+        <div class="dual-story reveal-photo"><figure><img src="education_students.jpg" alt="Students participating in a classroom"></figure><figure><img src="education_teacher.jpg" alt="Teacher leading a classroom lesson"></figure></div>
         <h2>Education</h2>
         <p>We are actively driving a couple of education-related CSR projects across India, with a focus on improving access to quality learning opportunities and supporting long-term educational development in underserved communities.</p>
-        <button class="learn" type="button" data-toggle="projects-education">Learn more →</button>
-        <div class="project-list" id="projects-education">
-          <div class="panel-filter"><button class="panel-chip active" data-year="all" type="button">All years</button><button class="panel-chip" data-year="2024-25" type="button">FY 2024–25</button><button class="panel-chip" data-year="2025-26" type="button">FY 2025–26</button></div>
-          <div class="year-group" data-year="2024-25">
-            <div class="year">FY 2024–25</div>
-            <ul>
-              <li class="proj">
-                <div class="proj-name">Sponsorship of skill development programs and Faculty development Programs for staff members — Maharashtra <span class="status-tag completed">Completed</span></div>
-                <div class="proj-details">
-                  <div class="dive-eyebrow">Project deep dive</div>
-                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">Completed</div></div>
-                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">Sponsorship of ongoing skill development and faculty development programs for teaching and non-teaching staff through structured courses and seminars, aimed at continuous capacity building.</div></div>
-                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Enabled continuous upskilling of teaching and non-teaching staff, strengthening instructional quality and administrative efficiency.</div></div>
-                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 4 – Quality education</div></div>
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div class="year-group" data-year="2025-26">
-            <div class="year">FY 2025–26</div>
-            <ul>
-              <li class="proj">
-                <div class="proj-name">Bridging Language Barriers for Disadvantaged Children — Karnataka <span class="status-tag completed">Completed</span></div>
-                <div class="proj-details">
-                  <div class="dive-eyebrow">Project deep dive</div>
-                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">Completed</div></div>
-                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">A phased spoken English intervention implemented across partner schools, combining volunteer-led classroom sessions, digital learning tools, and teacher training under Aarunya Foundation's SPARC initiative.</div></div>
-                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Improved students' spoken English proficiency in fluency, pronunciation, and comprehension; strengthened teacher capacity through methodology training.</div></div>
-                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 4 – Quality education</div></div>
-                </div>
-              </li>
-              <li class="proj">
-                <div class="proj-name">Advanced Microscopy Course to Empower Students — Karnataka <span class="status-tag completed">Completed</span></div>
-                <div class="proj-details">
-                  <div class="dive-eyebrow">Project deep dive</div>
-                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">Completed</div></div>
-                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">A 3-month microscopy training program combining classroom learning, lab sessions, online modules, and industry exposure to build job-ready skills for careers in research, diagnostics, and manufacturing.</div></div>
-                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Enhanced technical competencies and industry readiness of participants, supporting employability in high-growth clinical research and diagnostics sectors.</div></div>
-                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 8 – Decent work and economic growth (+1 more)</div></div>
-                </div>
-              </li>
-              <li class="proj">
-                <div class="proj-name">AYUSH Panchakarma Nurse Training — Wayanad, Kerala <span class="status-tag completed">Completed</span></div>
-                <div class="proj-details">
-                  <div class="dive-eyebrow">Project deep dive</div>
-                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">Completed</div></div>
-                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">6-month AYUSH Panchakarma Nurse Training program to skill tribal and rural women in Wayanad, Kerala, in certified Ayurveda-based nursing, enabling healthcare delivery and livelihood generation.</div></div>
-                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Enhanced availability of trained Panchakarma nurses in tribal communities, improved maternal and geriatric care, and created sustainable livelihood opportunities.</div></div>
-                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 3 – Good health and well-being (+1 more)</div></div>
-                </div>
-              </li>
-              <li class="proj">
-                <div class="proj-name">Kingdom of Childhood School — Karnataka <span class="status-tag completed">Completed</span></div>
-                <div class="proj-details">
-                  <div class="dive-eyebrow">Project deep dive</div>
-                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">Completed</div></div>
-                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">CSR support for construction of fittings, doors, and window fixtures at a new eco-friendly Steiner Waldorf school campus for inclusive education.</div></div>
-                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Enabled permanent, inclusive infrastructure supporting holistic learning and future expansion for neurotypical and neurodiverse children.</div></div>
-                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 4 – Quality education</div></div>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
+        <a class="sector-link" data-sector="education" href="#" target="_blank" rel="noopener">View Education projects in SharePoint <span class="arrow">→</span></a>
       </div>
     </section>
 
@@ -751,47 +745,10 @@
         </svg>
       </div>
       <div class="card">
+        <div class="dual-story reveal-photo"><figure><img src="community_planting.jpg" alt="Community tree planting"></figure><figure><img src="sapling_closeup.jpg" alt="Sapling held before planting"></figure></div>
         <h2>Sustainability</h2>
         <p>We are driving CSR initiatives for sustainability through tree plantation, afforestation, lake cleaning, and related environmental activities. These efforts restore ecosystems, improve biodiversity, and create long-term environmental value for communities.</p>
-        <button class="learn" type="button" data-toggle="projects-sustainability">Learn more →</button>
-        <div class="project-list" id="projects-sustainability">
-          <div class="panel-filter"><button class="panel-chip active" data-year="all" type="button">All years</button><button class="panel-chip" data-year="2025-26" type="button">FY 2025–26</button></div>
-          <div class="year-group" data-year="2025-26">
-            <div class="year">FY 2025–26</div>
-            <ul>
-              <li class="proj">
-                <div class="proj-name">Installation of a 5 kW solar power system — Sai Ranga Vidya Samsthe — Mysuru, Karnataka <span class="status-tag completed">Completed</span></div>
-                <div class="proj-details">
-                  <div class="dive-eyebrow">Project deep dive</div>
-                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">Completed</div></div>
-                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">Installation of a 5 kW solar power system at SRVS's residential campus to promote clean energy and sustainable operations for hearing-impaired children.</div></div>
-                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Reduced dependence on grid power and lowered the campus's carbon footprint while supporting a hearing-impaired student community.</div></div>
-                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 4 – Quality education (+1 more)</div></div>
-                </div>
-              </li>
-              <li class="proj">
-                <div class="proj-name">Benches Of Hope — Karnataka <span class="status-tag inprogress">In progress</span></div>
-                <div class="proj-details">
-                  <div class="dive-eyebrow">Project deep dive</div>
-                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">In progress</div></div>
-                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">Student benches and teacher tables distributed in schools, manufactured from reused wood.</div></div>
-                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Supporting over 1,000 students every year with durable, sustainably-sourced furniture.</div></div>
-                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 4 – Quality education (+2 more)</div></div>
-                </div>
-              </li>
-              <li class="proj">
-                <div class="proj-name">High-density forest plantation — Pali, Rajasthan — Pali, Rajasthan <span class="status-tag inprogress">In progress</span></div>
-                <div class="proj-details">
-                  <div class="dive-eyebrow">Project deep dive</div>
-                  <div class="dive-field"><div class="dive-label">Overall Project Status</div><div class="dive-value">In progress</div></div>
-                  <div class="dive-field"><div class="dive-label">Project Description</div><div class="dive-value">Establishing a dense green cover through plantation of over 32,000 trees using the Miyawaki method to support the sustainability of the local ecosystem.</div></div>
-                  <div class="dive-field"><div class="dive-label">Potential Project Impact</div><div class="dive-value">Likely improvement in local biodiversity, soil quality, and ecosystem health, with potential for enhanced carbon sequestration.</div></div>
-                  <div class="dive-field"><div class="dive-label">Impact Category – SDGs</div><div class="dive-value">SDG 13 – Climate action (+1 more)</div></div>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
+        <a class="sector-link" data-sector="sustainability" href="#" target="_blank" rel="noopener">View Sustainability projects in SharePoint <span class="arrow">→</span></a>
       </div>
     </section>
 
@@ -799,7 +756,7 @@
     <section class="stop wide" data-stop="3">
       <div class="card">
         <h2 style="margin-bottom:6px;">Where we're working</h2>
-        <p style="color:var(--muted); font-size:0.92rem; margin-bottom:16px;">Filter by year, then click a state or pin to see the projects there.</p>
+        <p style="color:var(--muted); font-size:0.92rem; margin-bottom:16px;">Filter by year, then click a pin on the map to see the projects there.</p>
         <div class="year-filter">
           <button class="year-chip active" data-year="all" type="button">All years</button>
           <button class="year-chip" data-year="2024-25" type="button">FY 2024–25</button>
@@ -808,7 +765,7 @@
         <div class="map-wrap">
           <div class="map-svg-box">
             <svg viewBox="0 0 480 560" width="100%">
-              <path class="india-outline" d="M 103.2,391.9 L 95.6,380.9 L 97.0,381.2 L 97.4,380.9 L 95.3,379.6 L 93.7,374.7 L 90.4,370.8 L 85.3,342.9 L 83.0,337.0 L 82.1,336.6 L 82.7,335.7 L 84.6,337.7 L 84.6,334.9 L 81.9,334.6 L 80.9,329.1 L 83.7,324.3 L 82.7,323.4 L 79.9,325.3 L 80.7,323.8 L 80.5,321.5 L 80.0,322.3 L 79.7,321.7 L 80.0,321.6 L 80.0,321.2 L 80.7,320.4 L 80.7,320.1 L 79.8,321.3 L 79.8,316.0 L 77.7,310.9 L 79.3,309.7 L 78.6,307.5 L 81.5,296.8 L 78.8,290.5 L 78.2,290.3 L 78.0,290.3 L 77.9,290.6 L 77.8,291.4 L 77.3,291.6 L 76.7,288.4 L 79.2,284.2 L 77.3,285.0 L 77.4,283.1 L 78.5,282.5 L 78.8,282.7 L 79.9,282.6 L 80.6,282.3 L 75.9,282.3 L 75.4,277.7 L 76.6,273.9 L 79.4,274.3 L 80.2,273.2 L 81.3,273.5 L 81.8,273.2 L 81.9,272.6 L 75.1,273.9 L 75.2,273.1 L 74.9,273.3 L 74.3,272.3 L 73.6,272.1 L 73.9,271.4 L 73.7,271.0 L 73.2,271.1 L 74.0,273.4 L 73.1,272.7 L 72.9,275.1 L 72.4,274.7 L 72.5,274.2 L 72.1,273.8 L 72.4,274.2 L 72.3,274.7 L 72.6,275.0 L 71.8,278.1 L 72.2,275.3 L 69.8,277.3 L 72.3,282.9 L 68.6,288.0 L 69.2,289.7 L 59.8,293.6 L 58.6,294.9 L 57.6,294.8 L 52.8,297.0 L 51.1,296.9 L 51.6,297.3 L 51.3,297.5 L 49.7,297.4 L 50.4,296.8 L 49.7,297.1 L 49.5,296.7 L 49.4,296.7 L 49.7,297.4 L 48.9,297.7 L 42.8,295.1 L 37.5,291.1 L 31.4,284.5 L 32.2,283.7 L 31.8,282.5 L 30.1,282.7 L 31.3,284.3 L 29.4,283.0 L 19.1,272.2 L 21.2,269.5 L 21.2,270.8 L 23.2,270.3 L 22.6,272.1 L 23.8,273.0 L 27.8,271.7 L 28.0,270.2 L 29.2,272.0 L 31.6,269.6 L 32.7,270.7 L 38.5,268.3 L 39.7,266.6 L 39.9,265.5 L 40.7,265.1 L 41.5,263.3 L 42.6,262.3 L 43.3,261.1 L 43.7,260.1 L 42.8,260.3 L 42.2,260.8 L 41.4,262.3 L 38.3,260.8 L 31.3,265.5 L 30.1,264.5 L 27.5,264.8 L 23.1,263.8 L 14.7,258.8 L 13.6,257.6 L 13.8,257.5 L 13.8,257.8 L 14.3,257.9 L 15.0,257.0 L 14.3,256.6 L 15.8,256.6 L 16.2,256.5 L 16.3,256.0 L 14.6,256.5 L 14.5,256.2 L 14.2,255.9 L 14.4,255.9 L 14.4,255.8 L 14.4,255.7 L 12.3,253.9 L 12.6,253.5 L 12.0,252.6 L 16.4,247.5 L 13.9,247.8 L 12.6,249.3 L 12.5,248.2 L 14.8,246.8 L 13.0,246.1 L 16.2,246.1 L 16.6,240.8 L 18.4,242.4 L 29.6,241.1 L 35.6,242.9 L 44.7,238.9 L 45.0,241.5 L 47.4,242.0 L 53.6,239.3 L 51.6,236.9 L 53.4,234.7 L 46.5,223.6 L 46.4,218.7 L 40.3,218.7 L 37.4,214.8 L 38.6,205.3 L 28.1,202.1 L 29.3,195.6 L 41.7,182.3 L 44.8,182.1 L 49.8,187.2 L 65.8,183.1 L 73.5,170.4 L 82.3,166.2 L 89.4,151.8 L 98.3,147.9 L 98.0,143.6 L 109.8,134.0 L 106.9,132.9 L 109.1,127.8 L 107.1,123.7 L 108.4,121.1 L 118.4,118.0 L 120.5,115.6 L 116.1,111.8 L 109.8,111.6 L 110.0,106.1 L 107.4,107.6 L 104.5,103.3 L 99.2,100.4 L 101.9,96.4 L 98.3,92.2 L 103.1,88.2 L 97.1,87.0 L 98.6,83.6 L 95.3,81.9 L 98.4,76.8 L 104.9,75.1 L 126.6,79.7 L 138.0,75.3 L 141.3,75.8 L 142.3,73.2 L 146.3,73.0 L 159.3,64.1 L 163.7,64.4 L 161.9,66.5 L 166.0,76.8 L 177.7,82.8 L 173.2,86.6 L 173.6,93.8 L 179.0,100.0 L 184.3,100.7 L 183.4,103.9 L 186.7,108.7 L 177.5,113.9 L 174.4,111.8 L 173.8,108.3 L 168.6,110.6 L 170.2,112.7 L 169.0,115.4 L 174.2,119.3 L 173.0,122.6 L 175.2,125.4 L 173.4,127.4 L 176.4,131.0 L 179.9,128.2 L 184.3,134.5 L 191.3,135.4 L 197.1,138.8 L 197.0,141.7 L 209.7,146.9 L 199.4,154.8 L 200.1,157.3 L 197.5,159.6 L 198.3,163.4 L 195.9,165.0 L 194.8,169.4 L 201.8,173.7 L 202.6,171.6 L 212.7,176.7 L 214.4,180.3 L 216.4,179.8 L 223.4,184.7 L 226.2,183.6 L 232.2,187.5 L 236.3,186.8 L 236.8,190.2 L 243.9,191.0 L 246.0,193.0 L 247.1,190.6 L 254.5,192.7 L 259.0,190.0 L 266.5,192.8 L 266.8,197.4 L 275.6,200.3 L 275.9,202.0 L 282.5,200.2 L 285.9,205.0 L 293.4,204.2 L 299.8,207.3 L 305.2,204.7 L 305.5,206.8 L 309.4,208.5 L 318.0,206.3 L 320.3,208.2 L 322.8,202.1 L 319.6,196.3 L 322.9,185.7 L 321.7,183.2 L 329.6,180.3 L 333.7,184.6 L 331.9,189.3 L 334.3,193.0 L 331.6,195.9 L 337.6,201.2 L 341.5,200.3 L 347.8,202.9 L 357.8,199.7 L 362.5,201.8 L 383.7,200.6 L 384.7,193.6 L 383.1,190.6 L 377.3,190.5 L 375.6,184.7 L 381.6,186.9 L 386.2,184.6 L 391.7,185.2 L 394.5,182.6 L 393.7,180.4 L 402.1,177.1 L 403.9,172.3 L 413.2,171.8 L 417.8,165.3 L 424.3,161.1 L 427.0,164.0 L 437.2,166.1 L 439.6,162.5 L 447.3,159.4 L 449.8,162.9 L 452.1,162.6 L 447.7,165.4 L 448.5,168.1 L 454.2,165.4 L 455.6,170.1 L 450.1,175.9 L 452.2,177.0 L 456.4,175.1 L 468.0,179.2 L 466.5,181.2 L 467.8,184.0 L 460.1,188.4 L 464.0,196.6 L 457.2,192.2 L 449.6,193.7 L 432.6,204.2 L 431.2,206.8 L 433.1,212.7 L 428.6,220.8 L 424.3,223.6 L 425.7,230.6 L 416.9,247.8 L 410.5,245.3 L 406.6,246.3 L 404.1,243.7 L 404.8,259.1 L 403.3,261.2 L 400.7,260.5 L 401.9,272.9 L 397.2,277.9 L 394.2,274.6 L 392.5,277.4 L 387.2,249.9 L 384.0,251.1 L 382.2,249.8 L 382.4,253.6 L 379.2,257.1 L 380.2,259.8 L 376.8,262.1 L 373.7,256.8 L 373.0,260.2 L 369.7,251.8 L 373.0,243.8 L 376.5,244.2 L 377.6,241.8 L 379.1,243.3 L 378.8,241.6 L 381.3,243.3 L 381.6,240.2 L 385.5,238.8 L 386.7,231.1 L 390.6,231.7 L 389.7,229.2 L 384.0,226.7 L 358.4,227.4 L 348.7,225.1 L 349.6,214.9 L 348.6,214.8 L 349.3,214.3 L 346.3,211.4 L 346.3,210.2 L 344.7,214.4 L 341.1,213.8 L 338.1,211.7 L 337.1,207.7 L 335.0,206.6 L 334.3,208.1 L 336.6,209.9 L 333.1,210.2 L 326.1,204.1 L 325.0,206.4 L 328.0,208.3 L 322.6,211.6 L 321.6,217.2 L 324.0,217.0 L 328.3,221.7 L 332.5,221.5 L 335.7,225.1 L 334.3,227.1 L 326.8,226.6 L 326.1,230.6 L 322.0,230.7 L 319.9,235.0 L 325.0,239.4 L 331.4,241.2 L 331.9,245.7 L 328.8,247.7 L 328.6,251.1 L 332.3,253.4 L 331.1,257.3 L 335.4,257.9 L 333.1,261.2 L 334.7,266.6 L 332.5,265.2 L 334.5,268.0 L 333.9,268.1 L 333.5,268.4 L 333.0,269.0 L 333.2,270.2 L 331.8,268.2 L 330.4,268.1 L 332.0,269.0 L 332.1,269.2 L 332.4,270.0 L 332.7,270.2 L 333.1,270.2 L 333.1,270.9 L 333.3,271.3 L 333.6,271.4 L 333.6,271.4 L 333.5,271.4 L 333.1,271.3 L 332.7,271.3 L 331.3,273.9 L 330.8,273.7 L 330.3,273.6 L 329.8,273.6 L 330.1,273.2 L 330.6,272.4 L 330.6,271.9 L 330.3,271.7 L 329.7,273.5 L 329.8,273.7 L 330.4,273.8 L 329.5,275.3 L 329.3,274.5 L 328.8,274.0 L 329.3,278.4 L 328.4,277.4 L 328.8,278.5 L 328.6,278.6 L 328.4,278.5 L 328.3,278.5 L 328.1,279.3 L 327.6,278.9 L 328.0,278.4 L 328.0,278.1 L 328.0,277.9 L 327.5,277.5 L 327.9,277.2 L 328.2,277.4 L 328.3,277.3 L 328.4,277.1 L 328.5,276.7 L 328.5,276.5 L 327.5,277.5 L 328.0,278.4 L 327.7,278.4 L 327.4,278.4 L 327.3,278.5 L 327.2,278.7 L 327.2,277.7 L 327.1,277.6 L 326.8,277.6 L 327.0,276.8 L 326.2,278.8 L 325.8,278.6 L 326.2,278.3 L 326.0,277.5 L 325.7,277.5 L 325.9,280.2 L 325.4,279.8 L 325.6,278.6 L 325.6,278.5 L 325.4,278.3 L 325.3,278.2 L 323.8,279.1 L 324.7,279.4 L 324.6,279.7 L 324.1,279.8 L 323.9,280.0 L 323.8,280.1 L 323.8,280.2 L 323.9,280.4 L 324.2,280.8 L 323.7,280.1 L 324.2,280.8 L 323.9,281.3 L 324.1,280.9 L 322.3,278.9 L 323.3,275.8 L 323.0,274.4 L 320.9,273.7 L 321.4,272.2 L 319.5,273.1 L 318.9,270.6 L 318.5,270.2 L 317.9,270.1 L 318.8,272.9 L 319.5,273.6 L 319.9,273.8 L 321.9,274.1 L 322.7,275.5 L 320.7,276.8 L 320.3,276.0 L 319.6,275.4 L 319.1,275.4 L 320.6,276.9 L 316.7,281.7 L 305.7,284.6 L 302.6,287.4 L 301.1,290.0 L 303.4,296.0 L 302.1,296.0 L 301.3,296.4 L 300.1,298.9 L 304.7,297.4 L 300.6,300.1 L 300.5,303.1 L 295.5,306.0 L 296.0,306.1 L 295.5,306.8 L 295.5,306.8 L 295.7,307.0 L 295.5,306.8 L 295.9,306.6 L 296.2,306.0 L 297.0,305.4 L 296.4,305.9 L 295.8,306.8 L 295.1,307.6 L 294.7,307.7 L 294.4,308.9 L 292.8,307.6 L 292.7,307.8 L 292.5,307.6 L 292.4,307.6 L 292.1,307.7 L 292.0,308.1 L 293.6,309.0 L 293.2,309.4 L 294.0,309.3 L 286.7,311.2 L 279.1,314.5 L 268.1,322.1 L 267.8,322.5 L 267.8,322.6 L 267.9,322.6 L 267.9,322.8 L 268.0,322.8 L 268.1,322.9 L 268.7,323.2 L 268.4,323.6 L 258.6,335.2 L 249.9,339.8 L 245.1,344.7 L 244.3,346.6 L 234.7,351.2 L 230.9,354.0 L 229.1,357.0 L 230.7,358.2 L 230.8,356.4 L 230.9,357.4 L 230.5,360.0 L 229.0,360.5 L 229.4,362.7 L 230.0,362.6 L 230.0,362.7 L 220.7,366.7 L 217.9,366.0 L 215.8,366.2 L 215.4,365.9 L 215.1,366.0 L 208.5,376.1 L 206.6,376.2 L 206.3,374.1 L 205.8,373.7 L 204.4,373.5 L 197.9,376.8 L 194.9,382.4 L 195.0,384.0 L 194.3,384.1 L 194.4,386.2 L 196.7,393.9 L 195.5,401.4 L 198.6,412.1 L 197.8,410.1 L 195.9,407.5 L 195.8,409.3 L 195.3,407.8 L 194.4,409.7 L 198.8,413.2 L 198.6,412.3 L 198.7,412.2 L 198.7,412.0 L 198.7,412.0 L 198.7,411.9 L 199.1,414.4 L 196.1,427.4 L 193.9,429.3 L 194.6,429.2 L 192.7,431.2 L 193.7,430.7 L 190.8,436.6 L 190.5,436.6 L 190.3,436.6 L 189.8,441.6 L 190.5,446.8 L 191.3,447.6 L 190.8,453.4 L 191.3,453.2 L 191.8,461.5 L 187.8,460.5 L 187.5,461.3 L 186.5,461.3 L 186.6,461.4 L 188.3,461.7 L 188.5,461.5 L 188.6,461.7 L 189.5,461.9 L 186.1,461.4 L 187.1,461.0 L 186.4,460.8 L 182.4,462.3 L 182.0,465.7 L 176.2,474.3 L 180.8,477.6 L 175.2,477.8 L 172.4,479.5 L 169.8,479.7 L 166.2,481.7 L 164.7,483.9 L 165.7,486.0 L 163.7,487.5 L 163.1,491.9 L 158.1,495.0 L 151.3,495.9 L 139.1,483.6 L 135.9,475.5 L 134.3,466.8 L 135.0,468.9 L 135.6,468.2 L 135.5,468.7 L 135.6,469.3 L 136.0,470.8 L 135.6,468.3 L 136.0,469.0 L 136.4,469.1 L 136.2,469.4 L 136.2,471.0 L 136.8,471.4 L 136.3,472.4 L 136.2,473.7 L 136.6,474.0 L 138.4,473.7 L 137.1,473.2 L 136.8,469.1 L 136.1,467.7 L 135.5,468.0 L 135.6,468.0 L 135.5,467.9 L 135.5,467.8 L 135.5,467.7 L 135.5,467.6 L 135.3,467.3 L 135.4,467.1 L 135.3,467.3 L 135.3,467.4 L 135.3,467.4 L 134.7,465.8 L 134.5,465.8 L 134.7,465.0 L 133.8,463.9 L 133.8,464.8 L 134.2,465.3 L 134.0,465.2 L 134.3,465.8 L 134.2,466.0 L 134.3,466.0 L 134.3,466.3 L 134.3,466.3 L 134.3,466.6 L 134.4,466.7 L 134.1,466.6 L 131.6,457.7 L 129.1,453.8 L 128.3,448.3 L 122.6,437.9 L 119.8,436.2 L 121.1,436.0 L 120.6,435.4 L 119.6,435.5 L 119.2,434.7 L 118.9,434.6 L 120.0,434.6 L 120.1,434.0 L 118.9,434.4 L 118.9,434.7 L 119.5,435.5 L 117.9,434.6 L 118.2,433.6 L 117.8,432.6 L 111.9,421.3 L 109.0,405.6 L 104.9,394.2 L 103.9,395.0 L 103.2,391.9 Z"></path>
+              <path class="india-outline" d="M 103.2,391.9 L 95.6,380.9 L 97.0,381.2 L 97.4,380.9 L 95.3,379.6 L 93.7,374.7 L 90.4,370.8 L 85.3,342.9 L 83.0,337.0 L 82.1,336.6 L 82.7,335.7 L 84.6,337.7 L 84.6,334.9 L 81.9,334.6 L 80.9,329.1 L 83.7,324.3 L 82.7,323.4 L 79.9,325.3 L 80.7,323.8 L 80.5,321.5 L 80.0,322.3 L 79.7,321.7 L 80.0,321.6 L 80.0,321.2 L 80.7,320.4 L 80.7,320.1 L 79.8,321.3 L 79.8,316.0 L 77.7,310.9 L 79.3,309.7 L 78.6,307.5 L 81.5,296.8 L 78.8,290.5 L 78.2,290.3 L 78.0,290.3 L 77.9,290.6 L 77.8,291.4 L 77.3,291.6 L 76.7,288.4 L 79.2,284.2 L 77.3,285.0 L 77.4,283.1 L 78.5,282.5 L 78.8,282.7 L 79.9,282.6 L 80.6,282.3 L 75.9,282.3 L 75.4,277.7 L 76.6,273.9 L 79.4,274.3 L 80.2,273.2 L 81.3,273.5 L 81.8,273.2 L 81.9,272.6 L 75.1,273.9 L 75.2,273.1 L 74.9,273.3 L 74.3,272.3 L 73.6,272.1 L 73.9,271.4 L 73.7,271.0 L 73.2,271.1 L 74.0,273.4 L 73.1,272.7 L 72.9,275.1 L 72.4,274.7 L 72.5,274.2 L 72.1,273.8 L 72.4,274.2 L 72.3,274.7 L 72.6,275.0 L 71.8,278.1 L 72.2,275.3 L 69.8,277.3 L 72.3,282.9 L 68.6,288.0 L 69.2,289.7 L 59.8,293.6 L 58.6,294.9 L 57.6,294.8 L 52.8,297.0 L 51.1,296.9 L 51.6,297.3 L 51.3,297.5 L 49.7,297.4 L 50.4,296.8 L 49.7,297.1 L 49.5,296.7 L 49.4,296.7 L 49.7,297.4 L 48.9,297.7 L 42.8,295.1 L 37.5,291.1 L 31.4,284.5 L 32.2,283.7 L 31.8,282.5 L 30.1,282.7 L 31.3,284.3 L 29.4,283.0 L 19.1,272.2 L 21.2,269.5 L 21.2,270.8 L 23.2,270.3 L 22.6,272.1 L 23.8,273.0 L 27.8,271.7 L 28.0,270.2 L 29.2,272.0 L 31.6,269.6 L 32.7,270.7 L 38.5,268.3 L 39.7,266.6 L 39.9,265.5 L 40.7,265.1 L 41.5,263.3 L 42.6,262.3 L 43.3,261.1 L 43.7,260.1 L 42.8,260.3 L 42.2,260.8 L 41.4,262.3 L 38.3,260.8 L 31.3,265.5 L 30.1,264.5 L 27.5,264.8 L 23.1,263.8 L 14.7,258.8 L 13.6,257.6 L 13.8,257.5 L 13.8,257.8 L 14.3,257.9 L 15.0,257.0 L 14.3,256.6 L 15.8,256.6 L 16.2,256.5 L 16.3,256.0 L 14.6,256.5 L 14.5,256.2 L 14.2,255.9 L 14.4,255.9 L 14.4,255.8 L 14.4,255.7 L 12.3,253.9 L 12.6,253.5 L 12.0,252.6 L 16.4,247.5 L 13.9,247.8 L 12.6,249.3 L 12.5,248.2 L 14.8,246.8 L 13.0,246.1 L 16.2,246.1 L 16.6,240.8 L 18.4,242.4 L 29.6,241.1 L 35.6,242.9 L 44.7,238.9 L 45.0,241.5 L 47.4,242.0 L 53.6,239.3 L 51.6,236.9 L 53.4,234.7 L 46.5,223.6 L 46.4,218.7 L 40.3,218.7 L 37.4,214.8 L 38.6,205.3 L 28.1,202.1 L 29.3,195.6 L 41.7,182.3 L 44.8,182.1 L 49.8,187.2 L 65.8,183.1 L 73.5,170.4 L 82.3,166.2 L 89.4,151.8 L 98.3,147.9 L 98.0,143.6 L 109.8,134.0 L 106.9,132.9 L 109.1,127.8 L 107.1,123.7 L 108.4,121.1 L 118.4,118.0 L 120.5,115.6 L 116.1,111.8 L 109.8,111.6 L 110.0,106.1 L 107.4,107.6 L 104.5,103.3 L 99.2,100.4 L 101.9,96.4 L 98.3,92.2 L 103.1,88.2 L 97.1,87.0 L 98.6,83.6 L 95.3,81.9 L 98.4,76.8 L 104.9,75.1 L 126.6,79.7 L 138.0,75.3 L 141.3,75.8 L 142.3,73.2 L 146.3,73.0 L 150.0,62.0 L 148.0,50.0 L 152.5,38.0 L 158.0,28.0 L 163.5,20.5 L 168.5,15.5 L 172.5,21.5 L 170.0,31.0 L 174.5,39.5 L 171.5,49.5 L 175.0,57.5 L 172.0,65.5 L 166.0,76.8 L 177.7,82.8 L 173.2,86.6 L 173.6,93.8 L 179.0,100.0 L 184.3,100.7 L 183.4,103.9 L 186.7,108.7 L 177.5,113.9 L 174.4,111.8 L 173.8,108.3 L 168.6,110.6 L 170.2,112.7 L 169.0,115.4 L 174.2,119.3 L 173.0,122.6 L 175.2,125.4 L 173.4,127.4 L 176.4,131.0 L 179.9,128.2 L 184.3,134.5 L 191.3,135.4 L 197.1,138.8 L 197.0,141.7 L 209.7,146.9 L 199.4,154.8 L 200.1,157.3 L 197.5,159.6 L 198.3,163.4 L 195.9,165.0 L 194.8,169.4 L 201.8,173.7 L 202.6,171.6 L 212.7,176.7 L 214.4,180.3 L 216.4,179.8 L 223.4,184.7 L 226.2,183.6 L 232.2,187.5 L 236.3,186.8 L 236.8,190.2 L 243.9,191.0 L 246.0,193.0 L 247.1,190.6 L 254.5,192.7 L 259.0,190.0 L 266.5,192.8 L 266.8,197.4 L 275.6,200.3 L 275.9,202.0 L 282.5,200.2 L 285.9,205.0 L 293.4,204.2 L 299.8,207.3 L 305.2,204.7 L 305.5,206.8 L 309.4,208.5 L 318.0,206.3 L 320.3,208.2 L 322.8,202.1 L 319.6,196.3 L 322.9,185.7 L 321.7,183.2 L 329.6,180.3 L 333.7,184.6 L 331.9,189.3 L 334.3,193.0 L 331.6,195.9 L 337.6,201.2 L 341.5,200.3 L 347.8,202.9 L 357.8,199.7 L 362.5,201.8 L 383.7,200.6 L 384.7,193.6 L 383.1,190.6 L 377.3,190.5 L 375.6,184.7 L 381.6,186.9 L 386.2,184.6 L 391.7,185.2 L 394.5,182.6 L 393.7,180.4 L 402.1,177.1 L 403.9,172.3 L 413.2,171.8 L 417.8,165.3 L 424.3,161.1 L 427.0,164.0 L 437.2,166.1 L 439.6,162.5 L 447.3,159.4 L 449.8,162.9 L 452.1,162.6 L 447.7,165.4 L 448.5,168.1 L 454.2,165.4 L 455.6,170.1 L 450.1,175.9 L 452.2,177.0 L 456.4,175.1 L 468.0,179.2 L 466.5,181.2 L 467.8,184.0 L 460.1,188.4 L 464.0,196.6 L 457.2,192.2 L 449.6,193.7 L 432.6,204.2 L 431.2,206.8 L 433.1,212.7 L 428.6,220.8 L 424.3,223.6 L 425.7,230.6 L 416.9,247.8 L 410.5,245.3 L 406.6,246.3 L 404.1,243.7 L 404.8,259.1 L 403.3,261.2 L 400.7,260.5 L 401.9,272.9 L 397.2,277.9 L 394.2,274.6 L 392.5,277.4 L 387.2,249.9 L 384.0,251.1 L 382.2,249.8 L 382.4,253.6 L 379.2,257.1 L 380.2,259.8 L 376.8,262.1 L 373.7,256.8 L 373.0,260.2 L 369.7,251.8 L 373.0,243.8 L 376.5,244.2 L 377.6,241.8 L 379.1,243.3 L 378.8,241.6 L 381.3,243.3 L 381.6,240.2 L 385.5,238.8 L 386.7,231.1 L 390.6,231.7 L 389.7,229.2 L 384.0,226.7 L 358.4,227.4 L 348.7,225.1 L 349.6,214.9 L 348.6,214.8 L 349.3,214.3 L 346.3,211.4 L 346.3,210.2 L 344.7,214.4 L 341.1,213.8 L 338.1,211.7 L 337.1,207.7 L 335.0,206.6 L 334.3,208.1 L 336.6,209.9 L 333.1,210.2 L 326.1,204.1 L 325.0,206.4 L 328.0,208.3 L 322.6,211.6 L 321.6,217.2 L 324.0,217.0 L 328.3,221.7 L 332.5,221.5 L 335.7,225.1 L 334.3,227.1 L 326.8,226.6 L 326.1,230.6 L 322.0,230.7 L 319.9,235.0 L 325.0,239.4 L 331.4,241.2 L 331.9,245.7 L 328.8,247.7 L 328.6,251.1 L 332.3,253.4 L 331.1,257.3 L 335.4,257.9 L 333.1,261.2 L 334.7,266.6 L 332.5,265.2 L 334.5,268.0 L 333.9,268.1 L 333.5,268.4 L 333.0,269.0 L 333.2,270.2 L 331.8,268.2 L 330.4,268.1 L 332.0,269.0 L 332.1,269.2 L 332.4,270.0 L 332.7,270.2 L 333.1,270.2 L 333.1,270.9 L 333.3,271.3 L 333.6,271.4 L 333.6,271.4 L 333.5,271.4 L 333.1,271.3 L 332.7,271.3 L 331.3,273.9 L 330.8,273.7 L 330.3,273.6 L 329.8,273.6 L 330.1,273.2 L 330.6,272.4 L 330.6,271.9 L 330.3,271.7 L 329.7,273.5 L 329.8,273.7 L 330.4,273.8 L 329.5,275.3 L 329.3,274.5 L 328.8,274.0 L 329.3,278.4 L 328.4,277.4 L 328.8,278.5 L 328.6,278.6 L 328.4,278.5 L 328.3,278.5 L 328.1,279.3 L 327.6,278.9 L 328.0,278.4 L 328.0,278.1 L 328.0,277.9 L 327.5,277.5 L 327.9,277.2 L 328.2,277.4 L 328.3,277.3 L 328.4,277.1 L 328.5,276.7 L 328.5,276.5 L 327.5,277.5 L 328.0,278.4 L 327.7,278.4 L 327.4,278.4 L 327.3,278.5 L 327.2,278.7 L 327.2,277.7 L 327.1,277.6 L 326.8,277.6 L 327.0,276.8 L 326.2,278.8 L 325.8,278.6 L 326.2,278.3 L 326.0,277.5 L 325.7,277.5 L 325.9,280.2 L 325.4,279.8 L 325.6,278.6 L 325.6,278.5 L 325.4,278.3 L 325.3,278.2 L 323.8,279.1 L 324.7,279.4 L 324.6,279.7 L 324.1,279.8 L 323.9,280.0 L 323.8,280.1 L 323.8,280.2 L 323.9,280.4 L 324.2,280.8 L 323.7,280.1 L 324.2,280.8 L 323.9,281.3 L 324.1,280.9 L 322.3,278.9 L 323.3,275.8 L 323.0,274.4 L 320.9,273.7 L 321.4,272.2 L 319.5,273.1 L 318.9,270.6 L 318.5,270.2 L 317.9,270.1 L 318.8,272.9 L 319.5,273.6 L 319.9,273.8 L 321.9,274.1 L 322.7,275.5 L 320.7,276.8 L 320.3,276.0 L 319.6,275.4 L 319.1,275.4 L 320.6,276.9 L 316.7,281.7 L 305.7,284.6 L 302.6,287.4 L 301.1,290.0 L 303.4,296.0 L 302.1,296.0 L 301.3,296.4 L 300.1,298.9 L 304.7,297.4 L 300.6,300.1 L 300.5,303.1 L 295.5,306.0 L 296.0,306.1 L 295.5,306.8 L 295.5,306.8 L 295.7,307.0 L 295.5,306.8 L 295.9,306.6 L 296.2,306.0 L 297.0,305.4 L 296.4,305.9 L 295.8,306.8 L 295.1,307.6 L 294.7,307.7 L 294.4,308.9 L 292.8,307.6 L 292.7,307.8 L 292.5,307.6 L 292.4,307.6 L 292.1,307.7 L 292.0,308.1 L 293.6,309.0 L 293.2,309.4 L 294.0,309.3 L 286.7,311.2 L 279.1,314.5 L 268.1,322.1 L 267.8,322.5 L 267.8,322.6 L 267.9,322.6 L 267.9,322.8 L 268.0,322.8 L 268.1,322.9 L 268.7,323.2 L 268.4,323.6 L 258.6,335.2 L 249.9,339.8 L 245.1,344.7 L 244.3,346.6 L 234.7,351.2 L 230.9,354.0 L 229.1,357.0 L 230.7,358.2 L 230.8,356.4 L 230.9,357.4 L 230.5,360.0 L 229.0,360.5 L 229.4,362.7 L 230.0,362.6 L 230.0,362.7 L 220.7,366.7 L 217.9,366.0 L 215.8,366.2 L 215.4,365.9 L 215.1,366.0 L 208.5,376.1 L 206.6,376.2 L 206.3,374.1 L 205.8,373.7 L 204.4,373.5 L 197.9,376.8 L 194.9,382.4 L 195.0,384.0 L 194.3,384.1 L 194.4,386.2 L 196.7,393.9 L 195.5,401.4 L 198.6,412.1 L 197.8,410.1 L 195.9,407.5 L 195.8,409.3 L 195.3,407.8 L 194.4,409.7 L 198.8,413.2 L 198.6,412.3 L 198.7,412.2 L 198.7,412.0 L 198.7,412.0 L 198.7,411.9 L 199.1,414.4 L 196.1,427.4 L 193.9,429.3 L 194.6,429.2 L 192.7,431.2 L 193.7,430.7 L 190.8,436.6 L 190.5,436.6 L 190.3,436.6 L 189.8,441.6 L 190.5,446.8 L 191.3,447.6 L 190.8,453.4 L 191.3,453.2 L 191.8,461.5 L 187.8,460.5 L 187.5,461.3 L 186.5,461.3 L 186.6,461.4 L 188.3,461.7 L 188.5,461.5 L 188.6,461.7 L 189.5,461.9 L 186.1,461.4 L 187.1,461.0 L 186.4,460.8 L 182.4,462.3 L 182.0,465.7 L 176.2,474.3 L 180.8,477.6 L 175.2,477.8 L 172.4,479.5 L 169.8,479.7 L 166.2,481.7 L 164.7,483.9 L 165.7,486.0 L 163.7,487.5 L 163.1,491.9 L 158.1,495.0 L 151.3,495.9 L 139.1,483.6 L 135.9,475.5 L 134.3,466.8 L 135.0,468.9 L 135.6,468.2 L 135.5,468.7 L 135.6,469.3 L 136.0,470.8 L 135.6,468.3 L 136.0,469.0 L 136.4,469.1 L 136.2,469.4 L 136.2,471.0 L 136.8,471.4 L 136.3,472.4 L 136.2,473.7 L 136.6,474.0 L 138.4,473.7 L 137.1,473.2 L 136.8,469.1 L 136.1,467.7 L 135.5,468.0 L 135.6,468.0 L 135.5,467.9 L 135.5,467.8 L 135.5,467.7 L 135.5,467.6 L 135.3,467.3 L 135.4,467.1 L 135.3,467.3 L 135.3,467.4 L 135.3,467.4 L 134.7,465.8 L 134.5,465.8 L 134.7,465.0 L 133.8,463.9 L 133.8,464.8 L 134.2,465.3 L 134.0,465.2 L 134.3,465.8 L 134.2,466.0 L 134.3,466.0 L 134.3,466.3 L 134.3,466.3 L 134.3,466.6 L 134.4,466.7 L 134.1,466.6 L 131.6,457.7 L 129.1,453.8 L 128.3,448.3 L 122.6,437.9 L 119.8,436.2 L 121.1,436.0 L 120.6,435.4 L 119.6,435.5 L 119.2,434.7 L 118.9,434.6 L 120.0,434.6 L 120.1,434.0 L 118.9,434.4 L 118.9,434.7 L 119.5,435.5 L 117.9,434.6 L 118.2,433.6 L 117.8,432.6 L 111.9,421.3 L 109.0,405.6 L 104.9,394.2 L 103.9,395.0 L 103.2,391.9 Z"></path>
               <g class="map-pin active" data-key="karnataka" data-years="2024-25,2025-26">
                 <circle class="pulse" cx="123.1" cy="387.2" r="13"></circle>
                 <circle class="dot" cx="123.1" cy="387.2" r="10"></circle>
@@ -850,19 +807,8 @@
                 <text x="54.099999999999994" y="266.5" text-anchor="end">Gujarat</text>
               </g>
             </svg>
-          </div>
-
-          <div>
-            <div class="location-list">              <button class="location-row active" data-key="karnataka" data-years="2024-25,2025-26" type="button"><span>Karnataka</span><span class="count">8</span></button>
-              <button class="location-row" data-key="maharashtra" data-years="2024-25" type="button"><span>Maharashtra</span><span class="count">1</span></button>
-              <button class="location-row" data-key="rajasthan" data-years="2025-26" type="button"><span>Rajasthan</span><span class="count">1</span></button>
-              <button class="location-row" data-key="kerala" data-years="2025-26" type="button"><span>Kerala</span><span class="count">1</span></button>
-              <button class="location-row" data-key="delhi" data-years="2025-26" type="button"><span>Delhi</span><span class="count">1</span></button>
-              <button class="location-row" data-key="tamilnadu" data-years="2025-26" type="button"><span>Tamil Nadu</span><span class="count">1</span></button>
-              <button class="location-row" data-key="mp" data-years="2025-26" type="button"><span>Madhya Pradesh</span><span class="count">1</span></button>
-              <button class="location-row" data-key="gujarat" data-years="2025-26" type="button"><span>Gujarat</span><span class="count">1</span></button>
-            </div>
             <div class="location-detail active" data-detail="karnataka">
+              <div class="popup-state"><span class="pin-dot"></span>Karnataka</div>
               <div class="year-group" data-year="2024-25">
                 <div class="year">FY 2024–25</div>
                 <ul>
@@ -883,6 +829,7 @@
               </div>
             </div>
             <div class="location-detail" data-detail="maharashtra">
+              <div class="popup-state"><span class="pin-dot"></span>Maharashtra</div>
               <div class="year-group" data-year="2024-25">
                 <div class="year">FY 2024–25</div>
                 <ul>
@@ -891,6 +838,7 @@
               </div>
             </div>
             <div class="location-detail" data-detail="rajasthan">
+              <div class="popup-state"><span class="pin-dot"></span>Rajasthan</div>
               <div class="year-group" data-year="2025-26">
                 <div class="year">FY 2025–26</div>
                 <ul>
@@ -899,6 +847,7 @@
               </div>
             </div>
             <div class="location-detail" data-detail="kerala">
+              <div class="popup-state"><span class="pin-dot"></span>Kerala</div>
               <div class="year-group" data-year="2025-26">
                 <div class="year">FY 2025–26</div>
                 <ul>
@@ -907,6 +856,7 @@
               </div>
             </div>
             <div class="location-detail" data-detail="delhi">
+              <div class="popup-state"><span class="pin-dot"></span>Delhi</div>
               <div class="year-group" data-year="2025-26">
                 <div class="year">FY 2025–26</div>
                 <ul>
@@ -915,6 +865,7 @@
               </div>
             </div>
             <div class="location-detail" data-detail="tamilnadu">
+              <div class="popup-state"><span class="pin-dot"></span>Tamil Nadu</div>
               <div class="year-group" data-year="2025-26">
                 <div class="year">FY 2025–26</div>
                 <ul>
@@ -923,6 +874,7 @@
               </div>
             </div>
             <div class="location-detail" data-detail="mp">
+              <div class="popup-state"><span class="pin-dot"></span>Madhya Pradesh</div>
               <div class="year-group" data-year="2025-26">
                 <div class="year">FY 2025–26</div>
                 <ul>
@@ -931,6 +883,7 @@
               </div>
             </div>
             <div class="location-detail" data-detail="gujarat">
+              <div class="popup-state"><span class="pin-dot"></span>Gujarat</div>
               <div class="year-group" data-year="2025-26">
                 <div class="year">FY 2025–26</div>
                 <ul>
@@ -953,13 +906,37 @@
         </svg>
         <h2 style="margin-bottom:14px;">Our impact, so far</h2>
         <p class="stat-intro">Our CSR initiative, focused on creating meaningful social and environmental impact, has made significant progress. This snapshot highlights a successful effort that's delivering positive change for communities and reinforcing our commitment to responsible growth.</p>
-        <div class="stat-grid">
-          <div class="stat"><div class="num">320K+</div><div class="tag">Trees planted</div><div class="sub">Across 10+ locations</div></div>
-          <div class="stat"><div class="num">8,500+</div><div class="tag">Students impacted</div><div class="sub">Through education programs</div></div>
-          <div class="stat"><div class="num">25,000+</div><div class="tag">Volunteer hours</div><div class="sub">Contributed by our people</div></div>
-          <div class="stat"><div class="num">35+</div><div class="tag">Community programs</div><div class="sub">Completed last year</div></div>
-          <div class="stat"><div class="num">1,00,000+</div><div class="tag">Patients screened</div><div class="sub">Contributed by our people</div></div>
-          <div class="stat"><div class="num">150+</div><div class="tag">Teachers trained</div><div class="sub">Contributed by our team</div></div>
+        <div class="impact-gallery reveal-photo"><figure class="big"><img src="community_meeting.jpg" alt="Community meeting outdoors"></figure><figure class="small"><img src="community_volunteers.jpg" alt="Community volunteers at a planting site"></figure><figure class="small"><img src="community_gift.jpg" alt="Educational materials being presented in a community"></figure></div><div class="stat-grid">
+          <div class="stat">
+            <div class="stat-icon"><img src="sapling_closeup.jpg" alt="Hands holding a young sapling"></div>
+            <div class="num" data-target="320" data-suffix="K+">0</div>
+            <div class="tag">Trees planted</div><div class="sub">Across 10+ locations</div>
+          </div>
+          <div class="stat">
+            <div class="stat-icon"><img src="education_students.jpg" alt="A student receiving learning materials"></div>
+            <div class="num" data-target="8500" data-suffix="+">0</div>
+            <div class="tag">Students impacted</div><div class="sub">Through education programs</div>
+          </div>
+          <div class="stat">
+            <div class="stat-icon"><img src="community_volunteers.jpg" alt="A group of volunteers together"></div>
+            <div class="num" data-target="25000" data-suffix="+">0</div>
+            <div class="tag">Volunteer hours</div><div class="sub">Contributed by our people</div>
+          </div>
+          <div class="stat">
+            <div class="stat-icon"><img src="community_meeting.jpg" alt="A community gathering"></div>
+            <div class="num" data-target="35" data-suffix="+">0</div>
+            <div class="tag">Community programs</div><div class="sub">Completed last year</div>
+          </div>
+          <div class="stat">
+            <div class="stat-icon"><img src="healthcare_senior.jpg" alt="A health worker screening a patient"></div>
+            <div class="num" data-target="100000" data-suffix="+">0</div>
+            <div class="tag">Patients screened</div><div class="sub">Contributed by our people</div>
+          </div>
+          <div class="stat">
+            <div class="stat-icon"><img src="education_teacher.jpg" alt="A teacher at a chalkboard"></div>
+            <div class="num" data-target="150" data-suffix="+">0</div>
+            <div class="tag">Teachers trained</div><div class="sub">Contributed by our team</div>
+          </div>
         </div>
       </div>
     </section>
@@ -972,15 +949,18 @@
         <div class="chart-grid">
 
           <div class="chart-card">
+            <div class="chart-icon"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13"/><path d="M6 16h5l2-6 4 12 2-6h7"/></svg></div>
             <h3>Healthcare</h3>
             <div class="donut">
               <svg viewBox="0 0 120 120">
                 <circle class="donut-track" cx="60" cy="60" r="50"></circle>
                 <circle class="donut-seg" cx="60" cy="60" r="50" stroke="var(--forest)"
-                        stroke-dasharray="134.64 179.52" stroke-dashoffset="0"
+                        stroke-dasharray="0 314.16" stroke-dashoffset="0"
+                        data-final="134.64 179.52"
                         transform="rotate(-90 60 60)"></circle>
                 <circle class="donut-seg" cx="60" cy="60" r="50" stroke="#D9A544"
-                        stroke-dasharray="179.52 134.64" stroke-dashoffset="-134.64"
+                        stroke-dasharray="0 314.16" stroke-dashoffset="-134.64"
+                        data-final="179.52 134.64"
                         transform="rotate(-90 60 60)"></circle>
               </svg>
               <div class="donut-total"><span class="n">7</span><span class="l">Projects</span></div>
@@ -1004,12 +984,14 @@
           </div>
 
           <div class="chart-card">
+            <div class="chart-icon"><svg viewBox="0 0 32 32"><path d="M4 10L16 5l12 5-12 5-12-5z"/><path d="M9 12v5c0 1.7 3 3 7 3s7-1.3 7-3v-5"/></svg></div>
             <h3>Education</h3>
             <div class="donut">
               <svg viewBox="0 0 120 120">
                 <circle class="donut-track" cx="60" cy="60" r="50"></circle>
                 <circle class="donut-seg" cx="60" cy="60" r="50" stroke="var(--forest)"
-                        stroke-dasharray="314.16 0" stroke-dashoffset="0"
+                        stroke-dasharray="0 314.16" stroke-dashoffset="0"
+                        data-final="314.16 0"
                         transform="rotate(-90 60 60)"></circle>
               </svg>
               <div class="donut-total"><span class="n">5</span><span class="l">Projects</span></div>
@@ -1033,15 +1015,18 @@
           </div>
 
           <div class="chart-card">
+            <div class="chart-icon"><svg viewBox="0 0 32 32"><path d="M16 27V20"/><circle cx="16" cy="13" r="7"/><circle cx="9" cy="18" r="5"/><circle cx="23" cy="18" r="5"/></svg></div>
             <h3>Sustainability</h3>
             <div class="donut">
               <svg viewBox="0 0 120 120">
                 <circle class="donut-track" cx="60" cy="60" r="50"></circle>
                 <circle class="donut-seg" cx="60" cy="60" r="50" stroke="var(--forest)"
-                        stroke-dasharray="104.72 209.44" stroke-dashoffset="0"
+                        stroke-dasharray="0 314.16" stroke-dashoffset="0"
+                        data-final="104.72 209.44"
                         transform="rotate(-90 60 60)"></circle>
                 <circle class="donut-seg" cx="60" cy="60" r="50" stroke="#D9A544"
-                        stroke-dasharray="209.44 104.72" stroke-dashoffset="-104.72"
+                        stroke-dasharray="0 314.16" stroke-dashoffset="-104.72"
+                        data-final="209.44 104.72"
                         transform="rotate(-90 60 60)"></circle>
               </svg>
               <div class="donut-total"><span class="n">3</span><span class="l">Projects</span></div>
@@ -1060,6 +1045,52 @@
                 <span class="ybar-label">FY 2025–26</span>
                 <span class="ybar-track"><span class="ybar-fill" style="width:60%;"></span></span>
                 <span class="ybar-count">3</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- STOP: Leadership spotlight -->
+    <section class="stop wide" data-stop="4d">
+      <div class="card">
+        <h2 style="margin-bottom:36px;">A word from leadership</h2>
+        <div class="leader-stack">
+
+          <div class="leader-row" data-leader-row>
+            <div class="leader-photo-slot">
+              <img src="ceo_photo.jpg" alt="[CEO Name], Chief Executive Officer">
+            </div>
+            <div class="leader-text">
+              <blockquote>
+                <span class="line">CSR isn't a line item for us —</span>
+                <span class="line">it's part of how we measure whether</span>
+                <span class="line">we're actually building the future</span>
+                <span class="line">we want to see.</span>
+              </blockquote>
+              <div class="line signature">
+                <div class="leader-name">[CEO Name]</div>
+                <div class="leader-title">Chief Executive Officer, Carl Zeiss India</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="leader-row reverse" data-leader-row>
+            <div class="leader-photo-slot">
+              <img src="community_volunteers.jpg" alt="[CFO Name], Chief Financial Officer">
+            </div>
+            <div class="leader-text">
+              <blockquote>
+                <span class="line">What I'm proudest of isn't just</span>
+                <span class="line">the budget we commit — it's that</span>
+                <span class="line">every rupee is tracked back</span>
+                <span class="line">to a real outcome.</span>
+              </blockquote>
+              <div class="line signature">
+                <div class="leader-name">[CFO Name]</div>
+                <div class="leader-title">Chief Financial Officer, Carl Zeiss India</div>
               </div>
             </div>
           </div>
@@ -1169,7 +1200,7 @@
           <button class="member" type="button">
             <div class="member-inner">
               <div class="member-face front">
-                <div class="avatar" style="background:#3F5E3F;">AV</div>
+                <div class="avatar" style="background:#2F5233;">AV</div>
                 <h3>Arjun Verma</h3>
                 <div class="role">Community Partnerships</div>
               </div>
@@ -1183,38 +1214,13 @@
       </div>
     </section>
 
-    <!-- STOP 7: Success stories carousel (video-capable, 3 slots) -->
-    <section class="stop wide" data-stop="6">
-      <div class="card">
-        <h2 style="margin-bottom:22px;">Our success stories</h2>
-        <div class="carousel" data-carousel>
-          <div class="carousel-scroller">
-            <div class="carousel-card">
-              <div class="media-box photo" data-photo="images/sairanga-solar.jpg">
-                <img src="images/sairanga-solar.jpg" alt="Rooftop solar installation at Sai Ranga Vidya Samsthe">
-              </div>
-              <div class="carousel-caption"><h3>Powering the campus with solar</h3><p>Sai Ranga Vidya Samsthe, Mysuru — a 5 kW rooftop solar system now supports the residential campus for hearing-impaired children.</p></div>
-            </div>
-            <div class="carousel-card">
-              <div class="media-box photo" data-photo="images/sairanga-lab.jpg">
-                <img src="images/sairanga-lab.jpg" alt="Computer lab at Sai Ranga Vidya Samsthe">
-              </div>
-              <div class="carousel-caption"><h3>A computer lab for every student</h3><p>Sai Ranga Vidya Samsthe, Mysuru — equipped workstations give students hands-on digital learning access.</p></div>
-            </div>
-            <div class="carousel-card">
-              <div class="media-box photo" data-photo="images/sairanga-classroom.jpg">
-                <img src="images/sairanga-classroom.jpg" alt="Classroom session at Sai Ranga Vidya Samsthe">
-              </div>
-              <div class="carousel-caption"><h3>Learning, every single day</h3><p>Sai Ranga Vidya Samsthe, Mysuru — inside a typical classroom session on campus.</p></div>
-            </div>
-          </div>
-          <div class="carousel-controls">
-            <button class="carousel-arrow" data-prev aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
-            <button class="carousel-arrow" data-next aria-label="Next"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
-          </div>
-        </div>
-      </div>
-    </section>
+    <!-- STOP 7: Success stories carousel -->
+<section class="stop wide" data-stop="6"><div class="card"><h2 style="margin-bottom:22px;">Stories of change</h2><div class="carousel" data-carousel><div class="carousel-scroller">
+<div class="carousel-card"><div class="media-box photo" data-photo="community_gift.jpg"><img src="community_gift.jpg" alt="Educational materials presented in a community"></div><div class="carousel-caption"><h3>Supporting learning journeys</h3><p>Resources placed in the hands of learners and communities.</p></div></div>
+<div class="carousel-card"><div class="media-box photo" data-photo="community_meeting.jpg"><img src="community_meeting.jpg" alt="Community gathering outdoors"></div><div class="carousel-caption"><h3>Listening before acting</h3><p>Local conversations help shape relevant action.</p></div></div>
+<div class="carousel-card"><div class="media-box photo" data-photo="community_planting.jpg"><img src="community_planting.jpg" alt="Community members planting a sapling"></div><div class="carousel-caption"><h3>Growing a greener future</h3><p>Planting work brings generations together around shared land.</p></div></div>
+<div class="carousel-card"><div class="media-box photo" data-photo="community_volunteers.jpg"><img src="community_volunteers.jpg" alt="Volunteer group at a planting site"></div><div class="carousel-caption"><h3>Volunteer power</h3><p>Collective participation turns plans into visible progress.</p></div></div>
+</div><div class="carousel-controls"><button class="carousel-arrow" data-prev aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><button class="carousel-arrow" data-next aria-label="Next"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button></div></div></div></section>
   </div>
 
   <div class="lightbox" id="lightbox">
@@ -1241,11 +1247,19 @@
   var marker = document.getElementById('marker');
   var petals = document.getElementById('petals');
   var stops = Array.prototype.slice.call(document.querySelectorAll('.stop'));
+  var pathIconLayer=document.getElementById('pathIconLayer'), pathIcons=[];
   var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
 
   var pathLength = 0;
 
+  var ICONS=[
+'<svg viewBox="0 0 32 32"><path d="M8 20h15a5 5 0 0 0 0-10 8 8 0 0 0-15-1 5.5 5.5 0 0 0 0 11z"/><path d="M11 24l-1 3M17 24l-1 3M23 24l-1 3"/></svg>',
+'<svg viewBox="0 0 32 32"><path d="M5 19h22l-4 7H9l-4-7z"/><path d="M16 6v13M16 7l8 8h-8"/></svg>',
+'<svg viewBox="0 0 32 32"><path d="M5 15l11-8 11 8v12H5V15z"/><path d="M11 27v-8h10v8"/></svg>',
+'<svg viewBox="0 0 32 32"><rect x="7" y="9" width="18" height="16" rx="3"/><path d="M16 9V5M13 5h6M11 15h.1M21 15h.1M11 21h10"/></svg>'];
+  function ensurePathIcons(){if(!pathIconLayer||pathIcons.length)return;stops.forEach(function(_,i){var e=document.createElement('div');e.className='path-icon';e.innerHTML=ICONS[i%ICONS.length];pathIconLayer.appendChild(e);pathIcons.push(e);});}
   function buildPath(){
+    ensurePathIcons();
     var w = stage.clientWidth;
     var h = stage.scrollHeight;
     svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
@@ -1263,6 +1277,7 @@
       return {x: x, y: y};
     });
 
+    pathIcons.forEach(function(icon,i){var q=waypoints[i];if(q){icon.style.left=q.x+'px';icon.style.top=q.y+'px';}});
     var start = {x: cx, y: 0};
     var end = {x: cx, y: h};
     var pts = [start].concat(waypoints).concat([end]);
@@ -1304,6 +1319,7 @@
 
     var pt = drawPath.getPointAtLength(pathLength * progress);
     marker.style.transform = 'translate(' + pt.x + 'px,' + pt.y + 'px)';
+    pathIcons.forEach(function(icon,i){icon.classList.toggle('visible',progress>=((i+.4)/Math.max(1,stops.length)));});
 
     var dy = window.scrollY - lastY;
     lastY = window.scrollY;
@@ -1336,20 +1352,59 @@
   onScroll();
   requestAnimationFrame(raf);
 
-  // ---------- Project map ----------
+
+  // Premium scroll morph and image reveals
+  var storyMorph=document.getElementById('storyMorph'),storyPanorama=document.getElementById('storyPanorama'),storyPortrait=document.getElementById('storyPortrait'),storyCopy=document.getElementById('storyCopy');
+  function updateStory(){if(!storyMorph)return;var r=storyMorph.getBoundingClientRect(),m=Math.max(1,storyMorph.offsetHeight-innerHeight),p=Math.max(0,Math.min(1,-r.top/m)),e=p*p*(3-2*p);storyPanorama.style.transform='translateY('+(-12*e)+'vh) scale('+(1-.26*e)+')';storyPortrait.style.left=(50-36*e)+'%';storyPortrait.style.bottom=(3+20*e)+'vh';storyPortrait.style.transform='translateX(-50%) scale('+(1-.12*e)+')';storyCopy.style.opacity=Math.max(0,Math.min(1,(e-.25)/.43));storyCopy.style.transform='translateY('+(35*(1-e))+'px)';}
+  addEventListener('scroll',updateStory,{passive:true});addEventListener('resize',updateStory);updateStory();
+  var photoObserver=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');photoObserver.unobserve(e.target);}})},{threshold:.18});document.querySelectorAll('.reveal-photo').forEach(function(e){photoObserver.observe(e);});
+
+  // ---------- Project map (floating popup follows the pin) ----------
   document.querySelectorAll('.map-wrap').forEach(function(wrap){
     var pins = Array.prototype.slice.call(wrap.querySelectorAll('.map-pin'));
-    var rows = Array.prototype.slice.call(wrap.querySelectorAll('.location-row'));
     var details = Array.prototype.slice.call(wrap.querySelectorAll('.location-detail'));
+    var svgBox = wrap.querySelector('.map-svg-box');
+    var svgEl = wrap.querySelector('svg');
+    var currentKey = 'karnataka';
+
+    function positionPopup(key){
+      var pin = pins.filter(function(p){ return p.getAttribute('data-key') === key; })[0];
+      var popup = details.filter(function(d){ return d.getAttribute('data-detail') === key; })[0];
+      if (!pin || !popup) return;
+      var dot = pin.querySelector('circle.dot');
+      var cx = parseFloat(dot.getAttribute('cx')), cy = parseFloat(dot.getAttribute('cy'));
+      var svgRect = svgEl.getBoundingClientRect();
+      var boxRect = svgBox.getBoundingClientRect();
+      var scaleX = svgRect.width / 480, scaleY = svgRect.height / 560;
+      var screenX = (svgRect.left - boxRect.left) + cx * scaleX;
+      var screenY = (svgRect.top - boxRect.top) + cy * scaleY;
+      var popupWidth = popup.offsetWidth || 270;
+      var left = screenX + 22;
+      if (left + popupWidth > boxRect.width) left = screenX - popupWidth - 22;
+      left = Math.max(6, left);
+      popup.style.left = left + 'px';
+      var popupHeight = popup.offsetHeight || 160;
+      var top = screenY - popupHeight / 2;
+      top = Math.max(6, Math.min(top, boxRect.height - popupHeight - 6));
+      popup.style.top = top + 'px';
+    }
 
     function activate(key){
+      currentKey = key;
       pins.forEach(function(p){ p.classList.toggle('active', p.getAttribute('data-key') === key); });
-      rows.forEach(function(r){ r.classList.toggle('active', r.getAttribute('data-key') === key); });
       details.forEach(function(d){ d.classList.toggle('active', d.getAttribute('data-detail') === key); });
+      requestAnimationFrame(function(){ positionPopup(key); });
       buildPath(); onScroll();
     }
-    pins.forEach(function(p){ p.addEventListener('click', function(){ activate(p.getAttribute('data-key')); }); });
-    rows.forEach(function(r){ r.addEventListener('click', function(){ activate(r.getAttribute('data-key')); }); });
+    pins.forEach(function(p){
+      var key = p.getAttribute('data-key');
+      p.addEventListener('click', function(){ activate(key); });
+      p.addEventListener('mouseenter', function(){ activate(key); });
+    });
+
+    window.addEventListener('resize', function(){ positionPopup(currentKey); });
+    window.addEventListener('load', function(){ positionPopup(currentKey); });
+    requestAnimationFrame(function(){ positionPopup(currentKey); });
 
     var chips = Array.prototype.slice.call(wrap.parentElement.querySelectorAll('.year-chip'));
     chips.forEach(function(chip){
@@ -1361,10 +1416,6 @@
         pins.forEach(function(p){
           var years = (p.getAttribute('data-years') || '').split(',');
           p.classList.toggle('dim', year !== 'all' && years.indexOf(year) === -1);
-        });
-        rows.forEach(function(r){
-          var years = (r.getAttribute('data-years') || '').split(',');
-          r.classList.toggle('dim', year !== 'all' && years.indexOf(year) === -1);
         });
         details.forEach(function(d){
           var groups = Array.prototype.slice.call(d.querySelectorAll('.year-group'));
@@ -1384,10 +1435,77 @@
             existingNote.remove();
           }
         });
+        requestAnimationFrame(function(){ positionPopup(currentKey); });
         buildPath(); onScroll();
       });
     });
   });
+
+  // ---------- Sector donut charts: draw in on scroll ----------
+  var donutObserved = new WeakSet();
+  var donutObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting && !donutObserved.has(entry.target)){
+        donutObserved.add(entry.target);
+        var segs = entry.target.querySelectorAll('.donut-seg');
+        segs.forEach(function(seg, i){
+          setTimeout(function(){
+            seg.setAttribute('stroke-dasharray', seg.getAttribute('data-final'));
+          }, i * 150);
+        });
+      }
+    });
+  }, {threshold: 0.35});
+  document.querySelectorAll('.donut').forEach(function(d){ donutObserver.observe(d); });
+
+  // ---------- Impact numbers: staggered entrance + count-up ----------
+  document.querySelectorAll('.stat').forEach(function(s, i){ s.style.setProperty('--i', i); });
+
+  function formatIndian(n){
+    n = Math.round(n);
+    var s = n.toString();
+    if (s.length <= 3) return s;
+    var last3 = s.slice(-3), rest = s.slice(0, -3);
+    rest = rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',');
+    return rest + ',' + last3;
+  }
+  function animateCount(el){
+    var target = parseFloat(el.getAttribute('data-target'));
+    var suffix = el.getAttribute('data-suffix') || '';
+    var useCommas = target >= 1000 && suffix.indexOf('K') === -1;
+    var duration = 1400;
+    var start = null;
+    function step(ts){
+      if (!start) start = ts;
+      var progress = Math.min((ts - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var value = target * eased;
+      el.textContent = (useCommas ? formatIndian(value) : Math.round(value)) + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  var numsObserved = new WeakSet();
+  var numsObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting && !numsObserved.has(entry.target)){
+        numsObserved.add(entry.target);
+        animateCount(entry.target);
+      }
+    });
+  }, {threshold: 0.4});
+  document.querySelectorAll('.stat .num[data-target]').forEach(function(n){ numsObserver.observe(n); });
+
+  // ---------- Leadership spotlight: photo slides in, quote lines reveal ----------
+  var leaderObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting){
+        entry.target.classList.add('visible');
+        leaderObserver.unobserve(entry.target);
+      }
+    });
+  }, {threshold: 0.3});
+  document.querySelectorAll('[data-leader-row]').forEach(function(row){ leaderObserver.observe(row); });
 
   // ---------- Team flip cards ----------
   document.querySelectorAll('.member').forEach(function(m, i){
@@ -1427,53 +1545,27 @@
   lightbox.addEventListener('click', function(e){ if (e.target === lightbox) closeLightbox(); });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeLightbox(); });
 
-  // ---------- Project detail popovers (tap fallback for touch devices) — pillar panels only, not the map ----------
-  document.querySelectorAll('.project-list .proj').forEach(function(p){
-    p.addEventListener('click', function(e){
-      // avoid toggling twice if the details panel itself was clicked (e.g. scrolling long text)
-      if (e.target.closest('.proj-details')) return;
-      var wasOpen = p.classList.contains('expanded');
-      document.querySelectorAll('.project-list .proj.expanded').forEach(function(o){ if (o !== p) o.classList.remove('expanded'); });
-      p.classList.toggle('expanded', !wasOpen);
-    });
-  });
-  document.addEventListener('click', function(e){
-    if (!e.target.closest('.project-list .proj')) {
-      document.querySelectorAll('.project-list .proj.expanded').forEach(function(o){ o.classList.remove('expanded'); });
+  // ==========================================================================
+  // SHAREPOINT LINKS — edit this list, nowhere else, to point each sector's
+  // button at your SharePoint list view. No project data lives on this site;
+  // this is just a link out to where the real list already lives.
+  // ==========================================================================
+  var SECTOR_LINKS = {
+    healthcare: "",      // e.g. "https://zeiss.sharepoint.com/sites/Bluebook/Lists/Projects/Healthcare-view.aspx"
+    education: "",
+    sustainability: ""
+  };
+  document.querySelectorAll('.sector-link').forEach(function(link){
+    var key = link.getAttribute('data-sector');
+    var url = SECTOR_LINKS[key];
+    if (url) {
+      link.href = url;
+    } else {
+      link.classList.add('pending');
+      link.href = '#';
+      link.removeAttribute('target');
+      link.querySelector('.arrow').textContent = '(link coming soon)';
     }
-  });
-
-  // ---------- Per-pillar "Learn more" year filters ----------
-  document.querySelectorAll('.panel-filter').forEach(function(filterBar){
-    var list = filterBar.closest('.project-list');
-    var chips = Array.prototype.slice.call(filterBar.querySelectorAll('.panel-chip'));
-    chips.forEach(function(chip){
-      chip.addEventListener('click', function(){
-        chips.forEach(function(c){ c.classList.remove('active'); });
-        chip.classList.add('active');
-        var year = chip.getAttribute('data-year');
-        var groups = Array.prototype.slice.call(list.querySelectorAll('.year-group'));
-        groups.forEach(function(g){
-          g.style.display = (year === 'all' || g.getAttribute('data-year') === year) ? '' : 'none';
-        });
-        buildPath(); onScroll();
-      });
-    });
-  });
-
-  // ---------- Expandable year-wise project lists ----------
-  document.querySelectorAll('[data-toggle]').forEach(function(btn){
-    var panel = document.getElementById(btn.getAttribute('data-toggle'));
-    btn.addEventListener('click', function(){
-      var isExpanded = panel.classList.toggle('expanded');
-      btn.textContent = isExpanded ? 'Show less ↑' : 'Learn more →';
-      buildPath(); onScroll();
-      panel.addEventListener('transitionend', function handler(e){
-        if (e.propertyName !== 'max-height') return;
-        buildPath(); onScroll();
-        panel.removeEventListener('transitionend', handler);
-      });
-    });
   });
 
   // ---------- Carousels (multi-card peek, scroll-driven) ----------
