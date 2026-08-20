@@ -1482,5 +1482,48 @@ body{background:linear-gradient(180deg,#f6f4ee 0%,#f1f5e9 38%,#faf8f2 68%,#eef3e
   });
 })();
 </script>
+  <style>
+#fsBtn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 6px;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+}
+#fsBtn:hover {
+  background: rgba(0,0,0,0.6);
+  transform: scale(1.05);
+}
+</style>
+
+<button id="fsBtn" aria-label="Toggle fullscreen" title="Fullscreen">⛶</button>
+
+<script>
+(function(){
+  var fsBtn = document.getElementById('fsBtn');
+  if (!fsBtn) return;
+  fsBtn.addEventListener('click', function(){
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen()
+        .catch(function(err){ console.warn('Fullscreen blocked:', err.message); });
+    } else {
+      document.exitFullscreen();
+    }
+  });
+  document.addEventListener('fullscreenchange', function(){
+    fsBtn.textContent = document.fullscreenElement ? '✕' : '⛶';
+  });
+})();
+</script>
 </body>
 </html>
