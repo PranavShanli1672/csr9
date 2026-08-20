@@ -1482,46 +1482,48 @@ body{background:linear-gradient(180deg,#f6f4ee 0%,#f1f5e9 38%,#faf8f2 68%,#eef3e
   });
 })();
 </script>
-  <style>
-#fsBtn {
+ <div id="fsGate">
+  <div>
+    <p>ZEISS India CSR</p>
+    <button id="fsGateBtn">Enter full screen</button>
+  </div>
+</div>
+
+<style>
+#fsGate {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 9999;
-  width: 44px;
-  height: 44px;
-  border: 1px solid rgba(255,255,255,0.35);
-  border-radius: 6px;
-  background: rgba(0,0,0,0.35);
-  backdrop-filter: blur(6px);
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f1a12;
   color: #fff;
-  font-size: 18px;
-  line-height: 1;
+  text-align: center;
   cursor: pointer;
-  transition: background .2s ease, transform .2s ease;
 }
-#fsBtn:hover {
-  background: rgba(0,0,0,0.6);
-  transform: scale(1.05);
+#fsGate.hidden { display: none; }
+#fsGateBtn {
+  margin-top: 16px;
+  padding: 12px 28px;
+  border: 1px solid rgba(255,255,255,.4);
+  border-radius: 4px;
+  background: transparent;
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
 }
 </style>
 
-<button id="fsBtn" aria-label="Toggle fullscreen" title="Fullscreen">⛶</button>
-
 <script>
 (function(){
-  var fsBtn = document.getElementById('fsBtn');
-  if (!fsBtn) return;
-  fsBtn.addEventListener('click', function(){
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen()
-        .catch(function(err){ console.warn('Fullscreen blocked:', err.message); });
-    } else {
-      document.exitFullscreen();
+  var gate = document.getElementById('fsGate');
+  if (!gate) return;
+  gate.addEventListener('click', function(){
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(function(){});
     }
-  });
-  document.addEventListener('fullscreenchange', function(){
-    fsBtn.textContent = document.fullscreenElement ? '✕' : '⛶';
+    gate.classList.add('hidden');
   });
 })();
 </script>
