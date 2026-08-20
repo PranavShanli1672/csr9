@@ -1486,7 +1486,7 @@ body{background:linear-gradient(180deg,#f6f4ee 0%,#f1f5e9 38%,#faf8f2 68%,#eef3e
   <p class="eyebrow">#TEAMZEISS · CSR</p>
   <h2>Our contribution to a world without waste</h2>
   <p class="sub">Educating minds, improving lives, sustaining tomorrow.</p>
-  <button id="fsGateBtn">Enter full screen ⛶</button>
+  <button id="fsGateBtn">Explore the full experience →</button>
 </div>
 
 <style>
@@ -1546,21 +1546,14 @@ body{background:linear-gradient(180deg,#f6f4ee 0%,#f1f5e9 38%,#faf8f2 68%,#eef3e
 <script>
 (function(){
   var gate = document.getElementById('fsGate');
-  if (!gate) { console.log('FS: gate element not found'); return; }
-  console.log('FS: listener attached');
+  if (!gate) return;
   gate.addEventListener('click', function(){
-    console.log('FS: click received');
-    var el = document.documentElement;
-    var req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
-    if (!req) { console.log('FS: no API available'); gate.classList.add('hidden'); return; }
-    try {
-      var p = req.call(el);
-      if (p && p.then) {
-        p.then(function(){ console.log('FS: success'); })
-         .catch(function(err){ console.log('FS: REJECTED —', err.name, err.message); });
-      }
-    } catch(e){ console.log('FS: threw —', e.message); }
-    gate.classList.add('hidden');
+    if (window.self !== window.top) {
+      window.open('https://pranavshanli1672.github.io/csr9/', '_blank');
+      gate.classList.add('hidden');
+    } else {
+      gate.classList.add('hidden');
+    }
   });
 })();
 </script>
