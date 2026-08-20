@@ -1546,11 +1546,20 @@ body{background:linear-gradient(180deg,#f6f4ee 0%,#f1f5e9 38%,#faf8f2 68%,#eef3e
 <script>
 (function(){
   var gate = document.getElementById('fsGate');
-  if (!gate) return;
+  if (!gate) { console.log('FS: gate element not found'); return; }
+  console.log('FS: listener attached');
   gate.addEventListener('click', function(){
-    if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen().catch(function(){});
-    }
+    console.log('FS: click received');
+    var el = document.documentElement;
+    var req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+    if (!req) { console.log('FS: no API available'); gate.classList.add('hidden'); return; }
+    try {
+      var p = req.call(el);
+      if (p && p.then) {
+        p.then(function(){ console.log('FS: success'); })
+         .catch(function(err){ console.log('FS: REJECTED —', err.name, err.message); });
+      }
+    } catch(e){ console.log('FS: threw —', e.message); }
     gate.classList.add('hidden');
   });
 })();
