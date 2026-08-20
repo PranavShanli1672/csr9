@@ -1482,11 +1482,11 @@ body{background:linear-gradient(180deg,#f6f4ee 0%,#f1f5e9 38%,#faf8f2 68%,#eef3e
   });
 })();
 </script>
- <div id="fsGate">
-  <div>
-    <p>ZEISS India CSR</p>
-    <button id="fsGateBtn">Enter full screen</button>
-  </div>
+<div id="fsGate">
+  <p class="eyebrow">#TEAMZEISS · CSR</p>
+  <h2>Our contribution to a world without waste</h2>
+  <p class="sub">Educating minds, improving lives, sustaining tomorrow.</p>
+  <button id="fsGateBtn">Enter full screen ⛶</button>
 </div>
 
 <style>
@@ -1495,26 +1495,54 @@ body{background:linear-gradient(180deg,#f6f4ee 0%,#f1f5e9 38%,#faf8f2 68%,#eef3e
   inset: 0;
   z-index: 10000;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #0f1a12;
+  background: linear-gradient(180deg, rgba(15,26,18,.55) 0%, rgba(15,26,18,.82) 100%);
+  backdrop-filter: blur(2px);
   color: #fff;
   text-align: center;
   cursor: pointer;
+  padding: 24px;
 }
 #fsGate.hidden { display: none; }
+#fsGate .eyebrow {
+  font-size: 12px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #c9d94a;
+  margin: 0 0 14px;
+}
+#fsGate h2 {
+  font-size: clamp(24px, 4vw, 44px);
+  line-height: 1.15;
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+#fsGate .sub {
+  font-size: 15px;
+  opacity: .85;
+  max-width: 460px;
+  margin: 0 auto 26px;
+}
 #fsGateBtn {
-  margin-top: 16px;
-  padding: 12px 28px;
-  border: 1px solid rgba(255,255,255,.4);
+  padding: 13px 34px;
+  border: 1px solid rgba(255,255,255,.5);
   border-radius: 4px;
-  background: transparent;
+  background: rgba(255,255,255,.08);
   color: #fff;
   font-size: 15px;
+  letter-spacing: .02em;
   cursor: pointer;
+  transition: background .25s ease, border-color .25s ease;
 }
-</style>
-
+#fsGateBtn:hover {
+  background: rgba(201,217,74,.9);
+  border-color: transparent;
+  color: #14210f;
+}
+<style>
+  
 <script>
 (function(){
   var gate = document.getElementById('fsGate');
